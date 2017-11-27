@@ -8,6 +8,7 @@
 // Include DirectX11 for interface access
 #include <d3d11.h>
 #include <DirectXMath.h>
+//#include <d3dx11tex.h>
 #include "cameraclass.h"
 #include "ShaderInvoker.h"
 using namespace DirectX;
@@ -23,9 +24,16 @@ class LetsDrawSomeStuff
 	ID3D11DeviceContext *myContext = nullptr;
 
 	// TODO: Add your own D3D11 variables here (be sure to "Release()" them when done!)
+	ID3D11Buffer *m_vertexBuffer, *m_indexBuffer;
+	int m_vertexCount, m_indexCount;
+	ID3D11ShaderResourceView* m_shaderResourceView;
+	D3D11_SHADER_RESOURCE_VIEW_DESC m_ShaderResourceViewDesc;
+	ID3D11Resource *m_textureResource;
+	D3D11_BUFFER_DESC vertexBufferDesc, indexBufferDesc;
+	D3D11_SUBRESOURCE_DATA vertexData, indexData;
+public:
 	CameraClass* m_Camera;
 	ShaderInvoker *m_ShaderInv;
-public:
 	// Init
 	LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint);
 	// Shutdown
@@ -34,14 +42,19 @@ public:
 	void Render();
 private:
 	int GetIndexCount();
-	ID3D11Buffer *m_vertexBuffer, *m_indexBuffer;
-	int m_vertexCount, m_indexCount;
+	bool InitializeTexture(ID3D11Device* device, WCHAR* filename);
 };
 
 struct Vertex
 {
 	XMFLOAT3 position;
 	XMFLOAT4 color;
+};
+
+struct MyTexVertex
+{
+	XMFLOAT3 position;
+	XMFLOAT2 UV;
 };
 
 
@@ -61,8 +74,6 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			// TODO: Create new DirectX stuff here! (Buffers, Shaders, Layouts, Views, Textures, etc...)
 			Vertex* vertices;
 			unsigned long* indices;
-			D3D11_BUFFER_DESC vertexBufferDesc, indexBufferDesc;
-			D3D11_SUBRESOURCE_DATA vertexData, indexData;
 			HRESULT result;
 
 			// Set the number of vertices in the vertex array.
@@ -76,7 +87,6 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 
 			// Create the index array.
 			indices = new unsigned long[m_indexCount];
-
 
 			// Load the vertex array with data.
 			vertices[0].position = XMFLOAT3(-1.0f, -1.0f, 0.0f);  // Bottom left.
@@ -93,7 +103,7 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			indices[1] = 1;  // Top middle.
 			indices[2] = 2;  // Bottom right.
 
-							 // Set up the description of the static vertex buffer.
+			// Set up the description of the static vertex buffer.
 			vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
 			vertexBufferDesc.ByteWidth = sizeof(Vertex) * m_vertexCount;
 			vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
@@ -133,6 +143,14 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			m_ShaderInv = new ShaderInvoker;
 			m_ShaderInv->Initialize(myDevice);
 
+			//Set up resource, shader view description, shader resource view
+			//m_textureResource;
+			//m_textureResource
+			//m_ShaderResourceViewDesc;
+			//m_shaderResourceView;
+
+			//myDevice->CreateShaderResourceView(m_textureResource, )
+
 			// Release the arrays now that the vertex and index buffers have been created and loaded.
 			delete[] vertices;
 			vertices = 0;
@@ -160,14 +178,14 @@ LetsDrawSomeStuff::~LetsDrawSomeStuff()
 		mySurface = nullptr; // the safest way to fly
 	}
 
-	// Release the index buffer.
+	// If index buffer exists, release and set to 0
 	if (m_indexBuffer)
 	{
 		m_indexBuffer->Release();
 		m_indexBuffer = 0;
 	}
 
-	// Release the vertex buffer.
+	// If vertex buffer exists, release and set to 0
 	if (m_vertexBuffer)
 	{
 		m_vertexBuffer->Release();
@@ -196,9 +214,9 @@ void LetsDrawSomeStuff::Render()
 			ID3D11RenderTargetView* const targets[] = { myRenderTargetView };
 			myContext->OMSetRenderTargets(1, targets, myDepthStencilView);
 
-			// Clear the screen to dark green
-			const float d_green[] = { 0, 0.5f, 0, 1 };
-			myContext->ClearRenderTargetView(myRenderTargetView, d_green);
+			// Clear the screen to black
+			const float black[] = { 0, 0, 0, 1 };
+			myContext->ClearRenderTargetView(myRenderTargetView, black);
 			
 			// TODO: Set your shaders, Update & Set your constant buffers, Attatch your vertex & index buffers, Set your InputLayout & Topology & Draw!
 			XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
@@ -222,12 +240,12 @@ void LetsDrawSomeStuff::Render()
 			myContext->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
 
 			// Set the type of primitive that should be rendered from this vertex buffer, in this case triangles.
-			myContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+			myContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 #pragma endregion
 
 			worldMatrix = DirectX::XMMatrixIdentity();
-			m_Camera->GetViewMatrix(viewMatrix);//may have to assign;
+			m_Camera->GetViewMatrix(viewMatrix);
 			projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(3.14f / 4.0f, 1024 / 768, 0.1f, 10);
 
 			m_ShaderInv->Render(myContext, GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
@@ -245,4 +263,13 @@ void LetsDrawSomeStuff::Render()
 int LetsDrawSomeStuff::GetIndexCount()
 {
 	return m_indexCount;
+}
+
+inline bool LetsDrawSomeStuff::InitializeTexture(ID3D11Device * device, WCHAR * filename)
+{
+	HRESULT result;
+
+
+
+	return true;
 }

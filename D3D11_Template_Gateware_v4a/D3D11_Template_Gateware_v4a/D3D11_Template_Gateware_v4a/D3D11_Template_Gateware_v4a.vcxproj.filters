@@ -43,5 +43,11 @@
     <FxCompile Include="MyVertexShader.hlsl">
       <Filter>Header Files</Filter>
     </FxCompile>
+    <FxCompile Include="MyTexVertexShader.hlsl">
+      <Filter>Header Files</Filter>
+    </FxCompile>
+    <FxCompile Include="MyTexPixelShader.hlsl">
+      <Filter>Header Files</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>
