@@ -124,11 +124,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CameraClass.h" />
+    <ClInclude Include="DirectXTex-master\DDSTextureLoader\DDSTextureLoader.h" />
+    <ClInclude Include="DirectXTex-master\DirectXTex\DirectXTex.h" />
     <ClInclude Include="LetsDrawSomeStuff.h" />
     <ClInclude Include="ShaderInvoker.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CameraClass.cpp" />
+    <ClCompile Include="DirectXTex-master\DDSTextureLoader\DDSTextureLoader.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ShaderInvoker.cpp" />
   </ItemGroup>
@@ -221,6 +224,9 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="HatDoggo.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -8,9 +8,13 @@
 #include <DirectXMath.h>
 #include "MyVertexShader.csh"
 #include "MyPixelShader.csh"
-
+#include "MyTexPixelShader.csh"
+#include "MyTexVertexShader.csh"
 using namespace std;
 using namespace DirectX;
+
+#define TEXTURESH true
+#define COLORSH false
 
 class ShaderInvoker
 {
@@ -41,8 +45,12 @@ private:
 
 private:
 	ID3D11VertexShader* m_vertexShader;
+	ID3D11VertexShader* m_vertexTexShader;
+	ID3D11PixelShader * m_pixelTexShader;
 	ID3D11PixelShader* m_pixelShader;
 	ID3D11InputLayout* m_layout;
 	ID3D11Buffer* m_matrixBuffer;
+	ID3D11SamplerState* m_samplerState;
+	D3D11_SAMPLER_DESC m_samplerDesc;
 };
 

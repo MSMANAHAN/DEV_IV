@@ -8,10 +8,16 @@
 // Include DirectX11 for interface access
 #include <d3d11.h>
 #include <DirectXMath.h>
+#include <dxgiformat.h> 
+#include "DirectXTex-master\DirectXTex\DirectXTex.h"
+#include "DirectXTex-master\DDSTextureLoader\DDSTextureLoader.h"
 //#include <d3dx11tex.h>
 #include "cameraclass.h"
 #include "ShaderInvoker.h"
 using namespace DirectX;
+
+#define COLOR false
+#define TEXTURE true
 
 // Simple Container class to make life easier/cleaner
 class LetsDrawSomeStuff
@@ -28,7 +34,9 @@ class LetsDrawSomeStuff
 	int m_vertexCount, m_indexCount;
 	ID3D11ShaderResourceView* m_shaderResourceView;
 	D3D11_SHADER_RESOURCE_VIEW_DESC m_ShaderResourceViewDesc;
-	ID3D11Resource *m_textureResource;
+	ID3D11Resource * m_texture;
+	ID3D11Texture2D * m_textureTwoD;
+
 	D3D11_BUFFER_DESC vertexBufferDesc, indexBufferDesc;
 	D3D11_SUBRESOURCE_DATA vertexData, indexData;
 public:
@@ -42,7 +50,6 @@ public:
 	void Render();
 private:
 	int GetIndexCount();
-	bool InitializeTexture(ID3D11Device* device, WCHAR* filename);
 };
 
 struct Vertex
@@ -53,6 +60,11 @@ struct Vertex
 
 struct MyTexVertex
 {
+	MyTexVertex() {};
+	MyTexVertex(float x, float y, float z,
+		float u, float v)
+		: position(x, y, z), UV(u, v) {}
+
 	XMFLOAT3 position;
 	XMFLOAT2 UV;
 };
@@ -71,10 +83,180 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			mySurface->GetSwapchain((void**)&mySwapChain);
 			mySurface->GetContext((void**)&myContext);
 
+			#pragma region Not needed
+#if 0
+			m_Image->format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+			m_Image->height = 1024;
+			m_Image->width = 1024;
+			m_Image->rowPitch = 128;
+			m_Image->slicePitch = 128;
+			m_Image->pixels = (uint8_t)1048576;//1048576
+
+			m_Meta->arraySize = 1048576;
+			m_Meta->depth = 1;
+			m_Meta->dimension = TEX_DIMENSION_TEXTURE2D;
+			m_Meta->format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+			m_Meta->height = 1024;
+			m_Meta->width = 1024;
+			m_Meta->mipLevels = 1;
+			m_Meta->miscFlags = 0;
+			m_Meta->miscFlags2 = 0;
+			CreateShaderResourceView(myDevice, m_Image, 1, &m_Meta, &m_shaderResourceView);
+
+#endif // 0
+#if 0
+			D3D11_TEXTURE2D_DESC desc;
+			desc.Width = 256;
+			desc.Height = 256;
+			desc.MipLevels = desc.ArraySize = 1;
+			desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+			desc.SampleDesc.Count = 1;
+			desc.Usage = D3D11_USAGE_DYNAMIC;
+			desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+			desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+			desc.MiscFlags = 0;
+
+			ID3D11Texture2D *pTexture = NULL;
+			myDevice->CreateTexture2D(&desc, NULL, &pTexture);
+			
+
+#endif // 0
+#pragma endregion
+
 			// TODO: Create new DirectX stuff here! (Buffers, Shaders, Layouts, Views, Textures, etc...)
-			Vertex* vertices;
-			unsigned long* indices;
+			//Vertex* vertices;
 			HRESULT result;
+
+#if TEXTURE
+			result = CreateDDSTextureFromFile(myDevice, L"HatDoggo.dds", &m_texture, &m_shaderResourceView, DDS_ALPHA_MODE_OPAQUE);
+
+			if (FAILED(result))
+			{
+				cout << "Texture not work";
+			}
+
+			// Set the number of vertices in the vertex array.
+			m_vertexCount = 24;
+
+			// Set the number of indices in the index array.
+			m_indexCount = 36;		
+			MyTexVertex cubeVerts[] =
+			{
+				// Front Face
+				MyTexVertex(-1.0f, -1.0f, -1.0f, 0.0f, 1.0f),
+				MyTexVertex(-1.0f, 1.0f, -1.0f, 0.0f, 0.0f),
+				MyTexVertex(1.0f, 1.0f, -1.0f, 1.0f, 0.0f),
+				MyTexVertex(1.0f, -1.0f, -1.0f, 1.0f, 1.0f),
+
+				// Back Face
+				MyTexVertex(-1.0f, -1.0f, 1.0f, 1.0f, 1.0f),
+				MyTexVertex(1.0f, -1.0f, 1.0f, 0.0f, 1.0f),
+				MyTexVertex(1.0f, 1.0f, 1.0f, 0.0f, 0.0f),
+				MyTexVertex(-1.0f, 1.0f, 1.0f, 1.0f, 0.0f),
+
+				// Top Face
+				MyTexVertex(-1.0f, 1.0f, -1.0f, 0.0f, 1.0f),
+				MyTexVertex(-1.0f, 1.0f, 1.0f, 0.0f, 0.0f),
+				MyTexVertex(1.0f, 1.0f, 1.0f, 1.0f, 0.0f),
+				MyTexVertex(1.0f, 1.0f, -1.0f, 1.0f, 1.0f),
+
+				// Bottom Face
+				MyTexVertex(-1.0f, -1.0f, -1.0f, 1.0f, 1.0f),
+				MyTexVertex(1.0f, -1.0f, -1.0f, 0.0f, 1.0f),
+				MyTexVertex(1.0f, -1.0f, 1.0f, 0.0f, 0.0f),
+				MyTexVertex(-1.0f, -1.0f, 1.0f, 1.0f, 0.0f),
+
+				// Left Face
+				MyTexVertex(-1.0f, -1.0f, 1.0f, 0.0f, 1.0f),
+				MyTexVertex(-1.0f, 1.0f, 1.0f, 0.0f, 0.0f),
+				MyTexVertex(-1.0f, 1.0f, -1.0f, 1.0f, 0.0f),
+				MyTexVertex(-1.0f, -1.0f, -1.0f, 1.0f, 1.0f),
+
+				// Right Face
+				MyTexVertex(1.0f, -1.0f, -1.0f, 0.0f, 1.0f),
+				MyTexVertex(1.0f, 1.0f, -1.0f, 0.0f, 0.0f),
+				MyTexVertex(1.0f, 1.0f, 1.0f, 1.0f, 0.0f),
+				MyTexVertex(1.0f, -1.0f, 1.0f, 1.0f, 1.0f),
+			};
+
+			unsigned int indices[] = {
+				// Front Face
+				0,  1,  2,
+				0,  2,  3,
+
+				// Back Face
+				4,  5,  6,
+				4,  6,  7,
+
+				// Top Face
+				8,  9, 10,
+				8, 10, 11,
+
+				// Bottom Face
+				12, 13, 14,
+				12, 14, 15,
+
+				// Left Face
+				16, 17, 18,
+				16, 18, 19,
+
+				// Right Face
+				20, 21, 22,
+				20, 22, 23
+			};
+
+			// Set up the description of the static vertex buffer.
+			vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+			vertexBufferDesc.ByteWidth = sizeof(MyTexVertex) * m_vertexCount;
+			vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+			vertexBufferDesc.CPUAccessFlags = 0;
+			vertexBufferDesc.MiscFlags = 0;
+			vertexBufferDesc.StructureByteStride = 0;
+
+			// Give the subresource structure a pointer to the vertex data.
+			vertexData.pSysMem = cubeVerts;
+			vertexData.SysMemPitch = 0;
+			vertexData.SysMemSlicePitch = 0;
+
+			// Now create the vertex buffer.
+			result = myDevice->CreateBuffer(&vertexBufferDesc, &vertexData, &m_vertexBuffer);
+
+			// Set up the description of the static index buffer.
+			indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+			indexBufferDesc.ByteWidth = sizeof(unsigned int) * m_indexCount;
+			indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+			indexBufferDesc.CPUAccessFlags = 0;
+			indexBufferDesc.MiscFlags = 0;
+			indexBufferDesc.StructureByteStride = 0;
+
+			// Give the subresource structure a pointer to the index data.
+			indexData.pSysMem = indices;
+			indexData.SysMemPitch = 0;
+			indexData.SysMemSlicePitch = 0;
+
+			// Create the index buffer.
+			result = myDevice->CreateBuffer(&indexBufferDesc, &indexData, &m_indexBuffer);
+
+			// Create the camera object.
+			m_Camera = new CameraClass;
+			// Set the initial position of the camera.
+			m_Camera->SetPosition(0.0f, 0.0f, -5.0f);
+
+			m_ShaderInv = new ShaderInvoker;
+			m_ShaderInv->Initialize(myDevice);
+
+			// Release the arrays now that the vertex and index buffers have been created and loaded.
+			//delete[] cubeVerts;
+			//cubeVerts = 0;
+
+			//delete[] indices;
+			////indices = 0;
+#endif // TEXTURE
+
+#if COLOR
+			
+			Vertex* vertices;
+			unsigned int * indices;//may need to be unsigned long
 
 			// Set the number of vertices in the vertex array.
 			m_vertexCount = 3;
@@ -86,7 +268,7 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			vertices = new Vertex[m_vertexCount];
 
 			// Create the index array.
-			indices = new unsigned long[m_indexCount];
+			indices = new unsigned int[m_indexCount];
 
 			// Load the vertex array with data.
 			vertices[0].position = XMFLOAT3(-1.0f, -1.0f, 0.0f);  // Bottom left.
@@ -103,6 +285,10 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			indices[1] = 1;  // Top middle.
 			indices[2] = 2;  // Bottom right.
 
+
+			
+
+
 			// Set up the description of the static vertex buffer.
 			vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
 			vertexBufferDesc.ByteWidth = sizeof(Vertex) * m_vertexCount;
@@ -110,6 +296,7 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			vertexBufferDesc.CPUAccessFlags = 0;
 			vertexBufferDesc.MiscFlags = 0;
 			vertexBufferDesc.StructureByteStride = 0;
+
 
 			// Give the subresource structure a pointer to the vertex data.
 			vertexData.pSysMem = vertices;
@@ -121,7 +308,7 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 
 			// Set up the description of the static index buffer.
 			indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-			indexBufferDesc.ByteWidth = sizeof(unsigned long) * m_indexCount;
+			indexBufferDesc.ByteWidth = sizeof(unsigned int) * m_indexCount;
 			indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 			indexBufferDesc.CPUAccessFlags = 0;
 			indexBufferDesc.MiscFlags = 0;
@@ -157,6 +344,7 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 
 			delete[] indices;
 			indices = 0;
+#endif // 0
 		}
 	}
 }
@@ -170,7 +358,6 @@ LetsDrawSomeStuff::~LetsDrawSomeStuff()
 	myContext->Release();
 
 	// TODO: "Release()" more stuff here!
-
 
 	if (mySurface) // Free Gateware Interface
 	{
@@ -190,6 +377,16 @@ LetsDrawSomeStuff::~LetsDrawSomeStuff()
 	{
 		m_vertexBuffer->Release();
 		m_vertexBuffer = 0;
+	}
+
+	if (m_Camera)
+	{
+		delete m_Camera;
+	}
+
+	if (m_ShaderInv)
+	{
+		delete m_ShaderInv;
 	}
 }
 
@@ -215,7 +412,7 @@ void LetsDrawSomeStuff::Render()
 			myContext->OMSetRenderTargets(1, targets, myDepthStencilView);
 
 			// Clear the screen to black
-			const float black[] = { 0, 0, 0, 1 };
+			const float black[] = { 0, 0, 1, 1 };
 			myContext->ClearRenderTargetView(myRenderTargetView, black);
 			
 			// TODO: Set your shaders, Update & Set your constant buffers, Attatch your vertex & index buffers, Set your InputLayout & Topology & Draw!
@@ -228,10 +425,20 @@ void LetsDrawSomeStuff::Render()
 			unsigned int stride;
 			unsigned int offset;
 
+#if TEXTURE
+			// Set vertex buffer stride and offset.
+			stride = sizeof(MyTexVertex);
+			offset = 0;
 
+
+#endif // TEXTURE
+
+#if COLOR
 			// Set vertex buffer stride and offset.
 			stride = sizeof(Vertex);
 			offset = 0;
+
+#endif // COLOR
 
 			// Set the vertex buffer to active in the input assembler so it can be rendered.
 			myContext->IASetVertexBuffers(0, 1, &m_vertexBuffer, &stride, &offset);
@@ -249,12 +456,12 @@ void LetsDrawSomeStuff::Render()
 			projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(3.14f / 4.0f, 1024 / 768, 0.1f, 10);
 
 			m_ShaderInv->Render(myContext, GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
-
+			
 			// Present Backbuffer using Swapchain object
 			// Framerate is currently unlocked, we suggest "MSI Afterburner" to track your current FPS and memory usage.
 			mySwapChain->Present(0, 0);
 
-			// Free any temp DX handles aquired this frame
+			// Free any temp DX handles acquired this frame
 			myRenderTargetView->Release();
 		}
 	}
@@ -263,13 +470,4 @@ void LetsDrawSomeStuff::Render()
 int LetsDrawSomeStuff::GetIndexCount()
 {
 	return m_indexCount;
-}
-
-inline bool LetsDrawSomeStuff::InitializeTexture(ID3D11Device * device, WCHAR * filename)
-{
-	HRESULT result;
-
-
-
-	return true;
 }
