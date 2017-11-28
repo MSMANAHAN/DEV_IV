@@ -160,6 +160,60 @@ bool ShaderInvoker::InitializeShader(ID3D11Device* device)
 
 #endif // TEXTURESH
 
+#if MESHLIGHTSH
+	// Create the vertex shader from the buffer.
+	result = device->CreateVertexShader(MyMeshLightVertexShader, ARRAYSIZE(MyMeshLightVertexShader), NULL, &m_vertexMeshLightShader);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
+	// Create the pixel shader from the buffer.
+	result = device->CreatePixelShader(MyMeshLightPixelShader, ARRAYSIZE(MyMeshLightPixelShader), NULL, &m_pixelMeshLightShader);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
+	//Input Layout Setup
+	//Now setup the layout of the data that goes into the shader.
+
+	D3D11_INPUT_ELEMENT_DESC m_layoutDesc[] =
+	{
+		{ "POSITION",	0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD",	0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "NORMAL",		0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	};
+
+	// Get a count of the elements in the layout.
+	numElements = sizeof(m_layoutDesc) / sizeof(m_layoutDesc[0]);
+
+	// Create the vertex input layout.
+	result = device->CreateInputLayout(m_layoutDesc, numElements, MyMeshLightVertexShader,
+		ARRAYSIZE(MyMeshLightVertexShader), &m_layout);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
+	m_samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	m_samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	m_samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	m_samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	m_samplerDesc.MipLODBias = 0.0f;
+	m_samplerDesc.MaxAnisotropy = 1;
+	m_samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+	m_samplerDesc.BorderColor[0] = 0;
+	m_samplerDesc.BorderColor[1] = 0;
+	m_samplerDesc.BorderColor[2] = 0;
+	m_samplerDesc.BorderColor[3] = 0;
+	m_samplerDesc.MinLOD = 0;
+	m_samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+
+	result = device->CreateSamplerState(&m_samplerDesc, &m_samplerState);
+#endif // MESHLIGHTSH
+
+
 	// Setup the description of the dynamic matrix constant buffer that is in the vertex shader.
 	matrixBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
 	matrixBufferDesc.ByteWidth = sizeof(MatrixBufferType);
@@ -225,6 +279,22 @@ void ShaderInvoker::ShutdownShader()
 		m_vertexShader = 0;
 	}
 #endif // TEXTURESH
+
+#if MESHLIGHTSH
+	// Release the pixel shader.
+	if (m_pixelMeshLightShader)
+	{
+		m_pixelMeshLightShader->Release();
+		m_pixelMeshLightShader = 0;
+	}
+
+	// Release the vertex shader.
+	if (m_vertexMeshLightShader)
+	{
+		m_vertexMeshLightShader->Release();
+		m_vertexMeshLightShader = 0;
+	}
+#endif // MESHLIGHTSH
 
 
 	return;
@@ -292,6 +362,12 @@ void ShaderInvoker::RenderShader(ID3D11DeviceContext *deviceContext, int indexCo
 	deviceContext->PSSetSamplers(0, 1, &m_samplerState);
 #endif // TEXTURESH
 
+#if MESHLIGHTSH
+	// Set the vertex and pixel shaders that will be used to render this triangle.
+	deviceContext->VSSetShader(m_vertexMeshLightShader, NULL, 0);
+	deviceContext->PSSetShader(m_pixelMeshLightShader, NULL, 0);
+	deviceContext->PSSetSamplers(0, 1, &m_samplerState);
+#endif // MESHLIGHTSH
 
 	// Render the triangle.
 	deviceContext->DrawIndexed(indexCount, 0, 0);

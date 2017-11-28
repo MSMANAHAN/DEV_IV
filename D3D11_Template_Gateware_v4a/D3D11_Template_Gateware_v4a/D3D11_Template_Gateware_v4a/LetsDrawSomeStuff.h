@@ -14,10 +14,12 @@
 //#include <d3dx11tex.h>
 #include "cameraclass.h"
 #include "ShaderInvoker.h"
+#include "test pyramid.h"
 using namespace DirectX;
 
 #define COLOR false
-#define TEXTURE true
+#define TEXTURE false
+#define MESHLIGHT true
 
 // Simple Container class to make life easier/cleaner
 class LetsDrawSomeStuff
@@ -48,6 +50,8 @@ public:
 	~LetsDrawSomeStuff();
 	// Draw
 	void Render();
+	float rotation = 0;
+	float translation = 0;
 private:
 	int GetIndexCount();
 };
@@ -69,6 +73,18 @@ struct MyTexVertex
 	XMFLOAT2 UV;
 };
 
+struct MyMeshLightVertex
+{
+	MyMeshLightVertex() {};
+	MyMeshLightVertex(float x, float y, float z,
+		float u, float v, float w,
+		float nx, float ny, float nz)
+		: position(x, y, z), UVW(u, v, w), normals(nx, ny, nz) {}
+
+	XMFLOAT3 position;
+	XMFLOAT3 UVW;
+	XMFLOAT3 normals;
+};
 
 // Init
 LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
@@ -345,6 +361,61 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			delete[] indices;
 			indices = 0;
 #endif // 0
+
+#if MESHLIGHT
+			result = CreateDDSTextureFromFile(myDevice, L"GrassTexture.dds", &m_texture, &m_shaderResourceView, DXGI_ALPHA_MODE_UNSPECIFIED);
+
+			if (FAILED(result))
+			{
+				cout << "Texture not work";
+			}
+			// Set the number of vertices in the vertex array.
+			m_vertexCount = 768;
+
+			// Set the number of indices in the index array.
+			m_indexCount = 1674;
+
+			// Set up the description of the static vertex buffer.
+			vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+			vertexBufferDesc.ByteWidth = sizeof(_OBJ_VERT_) * m_vertexCount;
+			vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+			vertexBufferDesc.CPUAccessFlags = 0;
+			vertexBufferDesc.MiscFlags = 0;
+			vertexBufferDesc.StructureByteStride = 0;
+
+			// Give the subresource structure a pointer to the vertex data.
+			vertexData.pSysMem = test_pyramid_data;
+			vertexData.SysMemPitch = 0;
+			vertexData.SysMemSlicePitch = 0;
+
+			// Now create the vertex buffer.
+			result = myDevice->CreateBuffer(&vertexBufferDesc, &vertexData, &m_vertexBuffer);
+
+			// Set up the description of the static index buffer.
+			indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+			indexBufferDesc.ByteWidth = sizeof(unsigned int) * m_indexCount;
+			indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+			indexBufferDesc.CPUAccessFlags = 0;
+			indexBufferDesc.MiscFlags = 0;
+			indexBufferDesc.StructureByteStride = 0;
+
+			// Give the subresource structure a pointer to the index data.
+			indexData.pSysMem = test_pyramid_indicies;
+			indexData.SysMemPitch = 0;
+			indexData.SysMemSlicePitch = 0;
+
+			// Create the index buffer.
+			result = myDevice->CreateBuffer(&indexBufferDesc, &indexData, &m_indexBuffer);
+
+			// Create the camera object.
+			m_Camera = new CameraClass;
+			// Set the initial position of the camera.
+			m_Camera->SetPosition(0.0f, 0.0f, -5.0f);
+
+			m_ShaderInv = new ShaderInvoker;
+			m_ShaderInv->Initialize(myDevice);
+#endif // MESHLIGHT
+
 		}
 	}
 }
@@ -425,6 +496,14 @@ void LetsDrawSomeStuff::Render()
 			unsigned int stride;
 			unsigned int offset;
 
+#if MESHLIGHT
+			// Set vertex buffer stride and offset.
+			stride = sizeof(MyMeshLightVertex);
+			offset = 0;
+
+
+#endif // TEXTURE
+
 #if TEXTURE
 			// Set vertex buffer stride and offset.
 			stride = sizeof(MyTexVertex);
@@ -455,8 +534,9 @@ void LetsDrawSomeStuff::Render()
 			m_Camera->GetViewMatrix(viewMatrix);
 			projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(3.14f / 4.0f, 1024 / 768, 0.1f, 10);
 			myContext->PSSetShaderResources(0, 1, &m_shaderResourceView);
+			worldMatrix = XMMatrixRotationRollPitchYaw(rotation, 0, 0);
 			m_ShaderInv->Render(myContext, GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
-			worldMatrix = XMMatrixTranslation(4, 0, 0);
+			worldMatrix = XMMatrixTranslation(translation, 0, 0);
 			m_ShaderInv->Render(myContext, GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 
 			// Present Backbuffer using Swapchain object

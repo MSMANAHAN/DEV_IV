@@ -10,12 +10,14 @@
 #include "MyPixelShader.csh"
 #include "MyTexPixelShader.csh"
 #include "MyTexVertexShader.csh"
+#include "MyMeshLightVertexShader.csh"
+#include "MyMeshLightPixelShader.csh"
 using namespace std;
 using namespace DirectX;
 
-#define TEXTURESH true
+#define TEXTURESH false
 #define COLORSH false
-
+#define MESHLIGHTSH true
 class ShaderInvoker
 {
 private:
@@ -47,6 +49,8 @@ private:
 	ID3D11VertexShader* m_vertexShader;
 	ID3D11VertexShader* m_vertexTexShader;
 	ID3D11PixelShader * m_pixelTexShader;
+	ID3D11VertexShader* m_vertexMeshLightShader;
+	ID3D11PixelShader * m_pixelMeshLightShader;
 	ID3D11PixelShader* m_pixelShader;
 	ID3D11InputLayout* m_layout;
 	ID3D11Buffer* m_matrixBuffer;

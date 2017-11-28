@@ -30,6 +30,9 @@
     <ClInclude Include="DirectXTex-master\DDSTextureLoader\DDSTextureLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="test pyramid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -56,6 +59,12 @@
       <Filter>Header Files</Filter>
     </FxCompile>
     <FxCompile Include="MyTexPixelShader.hlsl">
+      <Filter>Header Files</Filter>
+    </FxCompile>
+    <FxCompile Include="MyMeshLightVertexShader.hlsl">
+      <Filter>Header Files</Filter>
+    </FxCompile>
+    <FxCompile Include="MyMeshLightPixelShader.hlsl">
       <Filter>Header Files</Filter>
     </FxCompile>
   </ItemGroup>
