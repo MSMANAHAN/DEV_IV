@@ -128,7 +128,7 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			HRESULT result;
 
 #if TEXTURE
-			result = CreateDDSTextureFromFile(myDevice, L"NiceHatDoggo.dds", &m_texture, &m_shaderResourceView, DDS_ALPHA_MODE_OPAQUE);
+			result = CreateDDSTextureFromFile(myDevice, L"GrassTexture.dds", &m_texture, &m_shaderResourceView, DXGI_ALPHA_MODE_UNSPECIFIED);
 
 			if (FAILED(result))
 			{
@@ -456,7 +456,9 @@ void LetsDrawSomeStuff::Render()
 			projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(3.14f / 4.0f, 1024 / 768, 0.1f, 10);
 			myContext->PSSetShaderResources(0, 1, &m_shaderResourceView);
 			m_ShaderInv->Render(myContext, GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
-			
+			worldMatrix = XMMatrixTranslation(4, 0, 0);
+			m_ShaderInv->Render(myContext, GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+
 			// Present Backbuffer using Swapchain object
 			// Framerate is currently unlocked, we suggest "MSI Afterburner" to track your current FPS and memory usage.
 			mySwapChain->Present(0, 0);

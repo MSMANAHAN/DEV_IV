@@ -37,7 +37,6 @@ bool ShaderInvoker::Render(ID3D11DeviceContext *deviceContext, int indexCount, X
 {
 	bool result;
 
-
 	// Set the shader parameters that it will use for rendering.
 	result = SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix);
 	if (!result)
