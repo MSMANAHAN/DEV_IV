@@ -128,7 +128,7 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			HRESULT result;
 
 #if TEXTURE
-			result = CreateDDSTextureFromFile(myDevice, L"HatDoggo.dds", &m_texture, &m_shaderResourceView, DDS_ALPHA_MODE_OPAQUE);
+			result = CreateDDSTextureFromFile(myDevice, L"NiceHatDoggo.dds", &m_texture, &m_shaderResourceView, DDS_ALPHA_MODE_OPAQUE);
 
 			if (FAILED(result))
 			{
@@ -454,7 +454,7 @@ void LetsDrawSomeStuff::Render()
 			worldMatrix = DirectX::XMMatrixIdentity();
 			m_Camera->GetViewMatrix(viewMatrix);
 			projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(3.14f / 4.0f, 1024 / 768, 0.1f, 10);
-
+			myContext->PSSetShaderResources(0, 1, &m_shaderResourceView);
 			m_ShaderInv->Render(myContext, GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 			
 			// Present Backbuffer using Swapchain object

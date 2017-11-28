@@ -254,7 +254,7 @@ bool ShaderInvoker::SetShaderParameters(ID3D11DeviceContext* deviceContext, XMMA
 	{
 		return false;
 	}
-
+	
 	// Get a pointer to the data in the constant buffer.
 	dataPtr = (MatrixBufferType*)mappedResource.pData;
 
@@ -266,10 +266,10 @@ bool ShaderInvoker::SetShaderParameters(ID3D11DeviceContext* deviceContext, XMMA
 	// Unlock the constant buffer.
 	deviceContext->Unmap(m_matrixBuffer, 0);
 
-	// Set the position of the constant buffer in the vertex shader.
+	// Position of the constant buffer in the vertex shader.
 	bufferNumber = 0;
 
-	// Finally set the constant buffer in the vertex shader with the updated values.
+	// Set the constant buffer in the vertex shader with the updated values.
 	deviceContext->VSSetConstantBuffers(bufferNumber, 1, &m_matrixBuffer);
 
 	return true;
