@@ -363,7 +363,7 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 #endif // 0
 
 #if MESHLIGHT
-			result = CreateDDSTextureFromFile(myDevice, L"GrassTexture.dds", &m_texture, &m_shaderResourceView, DXGI_ALPHA_MODE_UNSPECIFIED);
+			result = CreateDDSTextureFromFile(myDevice, L"Pyramid.dds", &m_texture, &m_shaderResourceView, DXGI_ALPHA_MODE_UNSPECIFIED);
 
 			if (FAILED(result))
 			{
@@ -534,7 +534,8 @@ void LetsDrawSomeStuff::Render()
 			m_Camera->GetViewMatrix(viewMatrix);
 			projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(3.14f / 4.0f, 1024 / 768, 0.1f, 10);
 			myContext->PSSetShaderResources(0, 1, &m_shaderResourceView);
-			worldMatrix = XMMatrixRotationRollPitchYaw(rotation, 0, 0);
+			//worldMatrix = XMMatrixRotationRollPitchYaw(rotation, 0, 0);
+			worldMatrix = XMMatrixScaling(3, 3, 3);
 			m_ShaderInv->Render(myContext, GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 			worldMatrix = XMMatrixTranslation(translation, 0, 0);
 			m_ShaderInv->Render(myContext, GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
