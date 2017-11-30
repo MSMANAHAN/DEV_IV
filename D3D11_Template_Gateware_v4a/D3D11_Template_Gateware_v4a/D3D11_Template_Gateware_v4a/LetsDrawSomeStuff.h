@@ -83,6 +83,20 @@ class LetsDrawSomeStuff
 	D3D11_SUBRESOURCE_DATA indexData3;
 #pragma endregion
 
+#pragma region Mesh4
+	ID3D11Buffer *m_vertexBuffer4;
+	ID3D11Buffer *m_indexBuffer4;
+	int m_vertexCount4;
+	int m_indexCount4;
+	D3D11_SHADER_RESOURCE_VIEW_DESC m_ShaderResourceViewDesc4;
+	ID3D11ShaderResourceView* m_shaderResourceView4;
+	ID3D11Resource * m_texture4;
+	D3D11_BUFFER_DESC vertexBufferDesc4;
+	D3D11_BUFFER_DESC indexBufferDesc4;
+	D3D11_SUBRESOURCE_DATA vertexData4;
+	D3D11_SUBRESOURCE_DATA indexData4;
+#pragma endregion
+
 
 public:
 	CameraClass* m_Camera;
@@ -546,6 +560,63 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			result = myDevice->CreateBuffer(&indexBufferDesc3, &indexData3, &m_indexBuffer3);
 #pragma endregion
 
+#pragma region Mesh4
+			MyMeshLightVertex circleArr[361];
+			unsigned int indicies[361];
+			//circle array initialization
+			for (int i = 0; i < 361; i++)
+			{
+				circleArr[i].normals.x = 0;
+				circleArr[i].normals.y = 0;
+				circleArr[i].normals.z = 0;
+
+				circleArr[i].UVW.x = 0;
+				circleArr[i].UVW.y = 0;
+				circleArr[i].UVW.z = 0;
+
+				circleArr[i].position.x = 0.95f *sin(XMConvertToRadians(i));
+				circleArr[i].position.y = 0.95f *cos(XMConvertToRadians(i));
+				circleArr[i].position.z = 1;
+				circleArr[i].position.w = 1;
+				indicies[i] = i;
+			}
+
+			// Set the number of vertices in the vertex array.
+			m_vertexCount4 = 361;
+
+			// Set the number of indices for the pyramid
+			m_indexCount4 = 361;
+
+			// Set up the description of the static vertex buffer.
+			vertexBufferDesc4.Usage = D3D11_USAGE_DEFAULT;
+			vertexBufferDesc4.ByteWidth = sizeof(MyMeshLightVertex) * m_vertexCount4;
+			vertexBufferDesc4.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+			vertexBufferDesc4.CPUAccessFlags = 0;
+			vertexBufferDesc4.MiscFlags = 0;
+			vertexBufferDesc4.StructureByteStride = 0;
+
+			// Give the subresource structure a pointer to the vertex data.
+			vertexData4.pSysMem = circleArr;
+			vertexData4.SysMemPitch = 0;
+			vertexData4.SysMemSlicePitch = 0;
+
+			// Now create the vertex buffer.
+			result = myDevice->CreateBuffer(&vertexBufferDesc4, &vertexData4, &m_vertexBuffer4);
+
+			// Set up the description of the static index buffer.
+			indexBufferDesc4.Usage = D3D11_USAGE_DEFAULT;
+			indexBufferDesc4.ByteWidth = sizeof(unsigned int) * (m_indexCount4);
+			indexBufferDesc4.BindFlags = D3D11_BIND_INDEX_BUFFER;
+			indexBufferDesc4.CPUAccessFlags = 0;
+			indexBufferDesc4.MiscFlags = 0;
+			indexBufferDesc4.StructureByteStride = 0;
+
+			indexData4.pSysMem = indicies;
+			indexData4.SysMemPitch = 0;
+			indexData4.SysMemSlicePitch = 0;
+			// Create the index buffer.
+			result = myDevice->CreateBuffer(&indexBufferDesc4, &indexData4, &m_indexBuffer4);
+#pragma endregion
 
 
 			// Create the camera object.
@@ -748,6 +819,22 @@ void LetsDrawSomeStuff::Render()
 				m_ShaderInv->Render(myContext, m_indexCount3, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
 				zGrass += 2.5f;
 			}
+#pragma endregion
+
+#pragma region Mesh4
+			//myContext->PSSetShaderResources(0, 1, &m_shaderResourceView4);
+			// Set the vertex buffer to active in the input assembler so it can be rendered.
+			myContext->IASetVertexBuffers(0, 1, &m_vertexBuffer4, &stride, &offset);
+
+			// Set the index buffer to active in the input assembler so it can be rendered.
+			myContext->IASetIndexBuffer(m_indexBuffer4, DXGI_FORMAT_R32_UINT, 0);
+
+			// Set the type of primitive that should be rendered from this vertex buffer, in this case triangles.
+			myContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
+
+			// Set the index buffer to active in the input assembler so it can be rendered.
+			worldMatrix = XMMatrixMultiply(XMMatrixScaling(45, 45, 45), XMMatrixTranslation(-translation, 4, 60));
+			m_ShaderInv->Render(myContext, m_indexCount4, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
 #pragma endregion
 
 
