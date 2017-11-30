@@ -28,9 +28,24 @@ struct PixelInputType
 float4 MeshLightPixelShader(PixelInputType input) : SV_TARGET
 {
     float4 textureColor;
+    float3 lightDir;
+    float lightIntensity;
+    float4 color;
+
 
     // Sample the pixel color from the texture using the sampler at this texture coordinate location.
-    textureColor = shaderTexture.Sample(SampleType, input.tex);
+    textureColor = shaderTexture.Sample(SampleType, (float2) input.tex);
 
-    return textureColor;
+        // Invert the light direction for calculations.
+    lightDir = -lightDirection;
+
+    // Calculate the amount of light on this pixel.
+    lightIntensity = saturate(dot((float3) input.normals, lightDir));
+    // Determine the final amount of diffuse color based on the diffuse color combined with the light intensity.
+    color = saturate(diffuseColor * lightIntensity);
+
+    // Multiply the texture pixel and the final diffuse color to get the final pixel color result.
+    color = color * textureColor;
+
+    return color;
 }

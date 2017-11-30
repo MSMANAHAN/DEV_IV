@@ -36,6 +36,9 @@ class LetsDrawSomeStuff
 	IDXGISwapChain *mySwapChain = nullptr;
 	ID3D11DeviceContext *myContext = nullptr;
 
+	XMFLOAT4 m_diffuseColor;
+	XMFLOAT3 m_lightDir;
+
 	// TODO: Add your own D3D11 variables here (be sure to "Release()" them when done!)
 #pragma region Mesh 1
 	ID3D11Buffer *m_vertexBuffer;
@@ -539,14 +542,17 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			result = myDevice->CreateBuffer(&indexBufferDesc3, &indexData3, &m_indexBuffer3);
 #pragma endregion
 
-
 			// Create the camera object.
 			m_Camera = new CameraClass;
+
 			// Set the initial position of the camera.
 			m_Camera->SetPosition(0.0f, 0.0f, -5.0f);
 
 			m_ShaderInv = new ShaderInvoker;
 			m_ShaderInv->Initialize(myDevice);
+
+			m_lightDir = XMFLOAT3(1, 0, 0);
+			m_diffuseColor = XMFLOAT4(1, 0, 0, 1);
 #endif // MESHLIGHT
 
 		}
@@ -616,7 +622,7 @@ void LetsDrawSomeStuff::Render()
 			myContext->OMSetRenderTargets(1, targets, myDepthStencilView);
 
 			// Clear screen to black
-			const float black[] = { 0, 0, 1, 1 };
+			const float black[] = { .5f, .5f, .5f, 1 };
 			myContext->ClearRenderTargetView(myRenderTargetView, black);
 			
 			// TODO: Set your shaders, Update & Set your constant buffers, Attatch your vertex & index buffers, Set your InputLayout & Topology & Draw!
@@ -681,7 +687,7 @@ void LetsDrawSomeStuff::Render()
 			//Individual Object worldMatrix
 			worldMatrix = XMMatrixMultiply(XMMatrixTranslation(0.0f, -05.0f, -0.0f), XMMatrixRotationRollPitchYaw(90, 0, 0));
 			//INDEXCOUNT, INDEXOFFSET
-			m_ShaderInv->Render(myContext, m_vertexCount, 0, worldMatrix, viewMatrix, projectionMatrix);
+			m_ShaderInv->Render(myContext, m_vertexCount, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
 
 #pragma endregion
 
@@ -695,7 +701,7 @@ void LetsDrawSomeStuff::Render()
 
 			// Set the index buffer to active in the input assembler so it can be rendered.
 			worldMatrix = XMMatrixMultiply(XMMatrixScaling(45, 45, 45),XMMatrixTranslation(4, 4, 60));
-			m_ShaderInv->Render(myContext, m_indexCount2, 0, worldMatrix, viewMatrix, projectionMatrix);
+			m_ShaderInv->Render(myContext, m_indexCount2, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
 
 #pragma endregion
 
@@ -713,7 +719,7 @@ void LetsDrawSomeStuff::Render()
 			{
 				// Set the index buffer to active in the input assembler so it can be rendered.
 				worldMatrix = XMMatrixMultiply(XMMatrixTranslation(0.0f, -0.0f, zGrass), XMMatrixScaling(1.0f, 1.0f, 1.0f));
-				m_ShaderInv->Render(myContext, m_indexCount3, 0, worldMatrix, viewMatrix, projectionMatrix);
+				m_ShaderInv->Render(myContext, m_indexCount3, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
 				zGrass += 2.5f;
 			}
 			float xgrass = zGrass /2;
@@ -722,7 +728,7 @@ void LetsDrawSomeStuff::Render()
 			{
 				// Set the index buffer to active in the input assembler so it can be rendered.
 				worldMatrix = XMMatrixMultiply(XMMatrixTranslation(xgrass, -0.0f, zGrass), XMMatrixScaling(1.0f, 1.0f, 1.0f));
-				m_ShaderInv->Render(myContext, m_indexCount3, 0, worldMatrix, viewMatrix, projectionMatrix);
+				m_ShaderInv->Render(myContext, m_indexCount3, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
 				zGrass += 2.5f;
 			}
 
@@ -731,7 +737,7 @@ void LetsDrawSomeStuff::Render()
 			{
 				// Set the index buffer to active in the input assembler so it can be rendered.
 				worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-xgrass, -0.0f, zGrass), XMMatrixScaling(1.0f, 1.0f, 1.0f));
-				m_ShaderInv->Render(myContext, m_indexCount3, 0, worldMatrix, viewMatrix, projectionMatrix);
+				m_ShaderInv->Render(myContext, m_indexCount3, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
 				zGrass += 2.5f;
 			}
 #pragma endregion
