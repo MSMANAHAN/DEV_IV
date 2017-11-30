@@ -95,6 +95,9 @@ public:
 	void Render();
 	float rotation = 0;
 	float translation = 0;
+	float nearPlane = 0.1f;
+	float farPlane = 50;
+	float zoomFOV = 4;
 private:
 	int GetIndexCount();
 };
@@ -122,9 +125,9 @@ struct MyMeshLightVertex
 	MyMeshLightVertex(float x, float y, float z,
 		float u, float v, float w,
 		float nx, float ny, float nz)
-		: position(x, y, z), UVW(u, v, w), normals(nx, ny, nz) {}
+		: position(x, y, z, w), UVW(u, v, w), normals(nx, ny, nz) {}
 
-	XMFLOAT3 position;
+	XMFLOAT4 position;
 	XMFLOAT3 UVW;
 	XMFLOAT3 normals;
 };
@@ -542,6 +545,13 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			result = myDevice->CreateBuffer(&indexBufferDesc3, &indexData3, &m_indexBuffer3);
 #pragma endregion
 
+#pragma region Mesh4
+
+
+
+#pragma endregion
+
+
 			// Create the camera object.
 			m_Camera = new CameraClass;
 
@@ -552,7 +562,7 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			m_ShaderInv->Initialize(myDevice);
 
 			m_lightDir = XMFLOAT3(1, 0, 0);
-			m_diffuseColor = XMFLOAT4(1, 0, 0, 1);
+			m_diffuseColor = XMFLOAT4(1, 1, 1, 1);
 #endif // MESHLIGHT
 
 		}
@@ -622,7 +632,7 @@ void LetsDrawSomeStuff::Render()
 			myContext->OMSetRenderTargets(1, targets, myDepthStencilView);
 
 			// Clear screen to black
-			const float black[] = { .5f, .5f, .5f, 1 };
+			const float black[] = { .5f, .05f, .5f, 1 };
 			myContext->ClearRenderTargetView(myRenderTargetView, black);
 			
 			// TODO: Set your shaders, Update & Set your constant buffers, Attatch your vertex & index buffers, Set your InputLayout & Topology & Draw!
@@ -672,7 +682,7 @@ void LetsDrawSomeStuff::Render()
 			//Set up matrices
 			worldMatrix = DirectX::XMMatrixIdentity();
 			m_Camera->GetViewMatrix(viewMatrix);
-			projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(3.14f / 4.0f, 1024 / 768, 0.1f, 600);
+			projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(3.14f / zoomFOV, 1024 / 768, nearPlane, farPlane);
 			
 #pragma region Mesh1
 			myContext->PSSetShaderResources(0, 1, &m_shaderResourceView);
@@ -700,7 +710,7 @@ void LetsDrawSomeStuff::Render()
 			myContext->IASetIndexBuffer(m_indexBuffer2, DXGI_FORMAT_R32_UINT, 0);
 
 			// Set the index buffer to active in the input assembler so it can be rendered.
-			worldMatrix = XMMatrixMultiply(XMMatrixScaling(45, 45, 45),XMMatrixTranslation(4, 4, 60));
+			worldMatrix = XMMatrixMultiply(XMMatrixScaling(45, 45, 45),XMMatrixTranslation(translation, 4, 60));
 			m_ShaderInv->Render(myContext, m_indexCount2, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
 
 #pragma endregion
