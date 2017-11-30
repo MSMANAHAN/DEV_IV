@@ -126,7 +126,11 @@
     <ClInclude Include="CameraClass.h" />
     <ClInclude Include="DirectXTex-master\DDSTextureLoader\DDSTextureLoader.h" />
     <ClInclude Include="DirectXTex-master\DirectXTex\DirectXTex.h" />
+    <ClInclude Include="Grass_01.h" />
+    <ClInclude Include="Grass_02.h" />
+    <ClInclude Include="Grass_03.h" />
     <ClInclude Include="LetsDrawSomeStuff.h" />
+    <ClInclude Include="model.h" />
     <ClInclude Include="ShaderInvoker.h" />
     <ClInclude Include="sword1.h" />
     <ClInclude Include="test pyramid.h" />

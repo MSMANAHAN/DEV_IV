@@ -4,6 +4,12 @@
 Texture2D shaderTexture;
 SamplerState SampleType;
 
+cbuffer LightBuffer
+{
+    float4 diffuseColor;
+    float3 lightDirection;
+    float padding;
+};
 
 //////////////
 // TYPEDEFS //

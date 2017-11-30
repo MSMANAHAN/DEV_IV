@@ -18,6 +18,8 @@
 #include "tree.h"
 #include "wall.h"
 #include "sword1.h"
+#include "model.h"
+#include "Grass_03.h"
 using namespace DirectX;
 
 #define COLOR false
@@ -494,17 +496,17 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 #pragma endregion
 
 #pragma region Mesh3
-			result = CreateDDSTextureFromFile(myDevice, L"Greatsword.dds", &m_texture3, &m_shaderResourceView3, DXGI_ALPHA_MODE_UNSPECIFIED);
+			result = CreateDDSTextureFromFile(myDevice, L"grass_diff.dds", &m_texture3, &m_shaderResourceView3, DXGI_ALPHA_MODE_UNSPECIFIED);
 
 			if (FAILED(result))
 			{
 				cout << "Texture not work";
 			}
 			// Set the number of vertices in the vertex array.
-			m_vertexCount3 = 1746;
+			m_vertexCount3 = 8989;
 
 			// Set the number of indices for the pyramid
-			m_indexCount3 = 5676;
+			m_indexCount3 = 18429;
 
 			// Set up the description of the static vertex buffer.
 			vertexBufferDesc3.Usage = D3D11_USAGE_DEFAULT;
@@ -515,7 +517,7 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			vertexBufferDesc3.StructureByteStride = 0;
 
 			// Give the subresource structure a pointer to the vertex data.
-			vertexData3.pSysMem = sword1_data;
+			vertexData3.pSysMem = Grass_03_data;
 			vertexData3.SysMemPitch = 0;
 			vertexData3.SysMemSlicePitch = 0;
 
@@ -530,7 +532,7 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			indexBufferDesc3.MiscFlags = 0;
 			indexBufferDesc3.StructureByteStride = 0;
 
-			indexData3.pSysMem = sword1_indicies;
+			indexData3.pSysMem = Grass_03_indicies;
 			indexData3.SysMemPitch = 0;
 			indexData3.SysMemSlicePitch = 0;
 			// Create the index buffer.
@@ -677,7 +679,7 @@ void LetsDrawSomeStuff::Render()
 			// Set the type of primitive that should be rendered from this vertex buffer, in this case triangles.
 			myContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 			//Individual Object worldMatrix
-			worldMatrix = XMMatrixRotationRollPitchYaw(90, 0, 0);
+			worldMatrix = XMMatrixMultiply(XMMatrixTranslation(0.0f, -05.0f, -0.0f), XMMatrixRotationRollPitchYaw(90, 0, 0));
 			//INDEXCOUNT, INDEXOFFSET
 			m_ShaderInv->Render(myContext, m_vertexCount, 0, worldMatrix, viewMatrix, projectionMatrix);
 
@@ -692,22 +694,46 @@ void LetsDrawSomeStuff::Render()
 			myContext->IASetIndexBuffer(m_indexBuffer2, DXGI_FORMAT_R32_UINT, 0);
 
 			// Set the index buffer to active in the input assembler so it can be rendered.
-			worldMatrix = XMMatrixTranslation(4, 0, 0);
+			worldMatrix = XMMatrixMultiply(XMMatrixScaling(45, 45, 45),XMMatrixTranslation(4, 4, 60));
 			m_ShaderInv->Render(myContext, m_indexCount2, 0, worldMatrix, viewMatrix, projectionMatrix);
 
 #pragma endregion
 
 #pragma region Mesh3
+			//Grass
 			myContext->PSSetShaderResources(0, 1, &m_shaderResourceView3);
 			// Set the vertex buffer to active in the input assembler so it can be rendered.
 			myContext->IASetVertexBuffers(0, 1, &m_vertexBuffer3, &stride, &offset);
 
 			// Set the index buffer to active in the input assembler so it can be rendered.
 			myContext->IASetIndexBuffer(m_indexBuffer3, DXGI_FORMAT_R32_UINT, 0);
+			float zGrass = -10.0f;
 
-			// Set the index buffer to active in the input assembler so it can be rendered.
-			worldMatrix = XMMatrixTranslation(-4, 0, 0);
-			m_ShaderInv->Render(myContext, m_indexCount3, 0, worldMatrix, viewMatrix, projectionMatrix);
+			for (unsigned int i = 0; i < 25; i++)
+			{
+				// Set the index buffer to active in the input assembler so it can be rendered.
+				worldMatrix = XMMatrixMultiply(XMMatrixTranslation(0.0f, -0.0f, zGrass), XMMatrixScaling(1.0f, 1.0f, 1.0f));
+				m_ShaderInv->Render(myContext, m_indexCount3, 0, worldMatrix, viewMatrix, projectionMatrix);
+				zGrass += 2.5f;
+			}
+			float xgrass = zGrass /2;
+			zGrass = -10.0f;
+			for (unsigned int i = 0; i < 25; i++)
+			{
+				// Set the index buffer to active in the input assembler so it can be rendered.
+				worldMatrix = XMMatrixMultiply(XMMatrixTranslation(xgrass, -0.0f, zGrass), XMMatrixScaling(1.0f, 1.0f, 1.0f));
+				m_ShaderInv->Render(myContext, m_indexCount3, 0, worldMatrix, viewMatrix, projectionMatrix);
+				zGrass += 2.5f;
+			}
+
+			zGrass = -10.0f;
+			for (unsigned int i = 0; i < 25; i++)
+			{
+				// Set the index buffer to active in the input assembler so it can be rendered.
+				worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-xgrass, -0.0f, zGrass), XMMatrixScaling(1.0f, 1.0f, 1.0f));
+				m_ShaderInv->Render(myContext, m_indexCount3, 0, worldMatrix, viewMatrix, projectionMatrix);
+				zGrass += 2.5f;
+			}
 #pragma endregion
 
 
