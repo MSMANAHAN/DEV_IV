@@ -88,6 +88,9 @@
     <FxCompile Include="MyMeshLightPixelShader.hlsl">
       <Filter>Header Files</Filter>
     </FxCompile>
+    <FxCompile Include="MyUVScrollingMeshLightPixelShader.hlsl">
+      <Filter>Header Files</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="HatDoggo.jpg">

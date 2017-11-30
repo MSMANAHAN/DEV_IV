@@ -12,6 +12,8 @@
 #include "MyTexVertexShader.csh"
 #include "MyMeshLightVertexShader.csh"
 #include "MyMeshLightPixelShader.csh"
+#include "MyUVScrollingMeshLightPixelShader.csh"
+
 using namespace std;
 using namespace DirectX;
 
@@ -43,6 +45,7 @@ public:
 	bool Initialize(ID3D11Device*);
 	void Shutdown();
 	bool Render(ID3D11DeviceContext*, int, int, XMMATRIX, XMMATRIX, XMMATRIX, XMFLOAT3, XMFLOAT4);
+	bool UVScrolling = false;
 
 private:
 	bool InitializeShader(ID3D11Device*);
@@ -57,13 +60,14 @@ private:
 	ID3D11PixelShader * m_pixelTexShader;
 	ID3D11VertexShader* m_vertexMeshLightShader;
 	ID3D11PixelShader * m_pixelMeshLightShader;
+	ID3D11PixelShader * m_pixelUVScrollingMeshLightShader;
+
 	ID3D11PixelShader* m_pixelShader;
 	ID3D11InputLayout* m_layout;
 	ID3D11Buffer* m_matrixBuffer;
 	ID3D11SamplerState* m_samplerState;
 	D3D11_SAMPLER_DESC m_samplerDesc;
 	ID3D11Buffer* m_lightBuffer;
-
 
 };
 

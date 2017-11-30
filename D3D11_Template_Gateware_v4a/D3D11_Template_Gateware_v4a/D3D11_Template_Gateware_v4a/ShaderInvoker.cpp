@@ -173,12 +173,21 @@ bool ShaderInvoker::InitializeShader(ID3D11Device* device)
 		return false;
 	}
 
-	// Create the pixel shader from the buffer.
-	result = device->CreatePixelShader(MyMeshLightPixelShader, ARRAYSIZE(MyMeshLightPixelShader), NULL, &m_pixelMeshLightShader);
-	if (FAILED(result))
-	{
-		return false;
-	}
+
+		// Create the pixel shader from the buffer.
+		result = device->CreatePixelShader(MyUVScrollingMeshLightPixelShader, ARRAYSIZE(MyUVScrollingMeshLightPixelShader), NULL, &m_pixelUVScrollingMeshLightShader);
+		if (FAILED(result))
+		{
+			return false;
+		}
+
+
+		// Create the pixel shader from the buffer.
+		result = device->CreatePixelShader(MyMeshLightPixelShader, ARRAYSIZE(MyMeshLightPixelShader), NULL, &m_pixelMeshLightShader);
+		if (FAILED(result))
+		{
+			return false;
+		}
 
 	//Input Layout Setup
 	//Now setup the layout of the data that goes into the shader.
@@ -317,6 +326,12 @@ void ShaderInvoker::ShutdownShader()
 		m_pixelMeshLightShader = 0;
 	}
 
+	if (m_pixelUVScrollingMeshLightShader)
+	{
+		m_pixelUVScrollingMeshLightShader->Release();
+		m_pixelUVScrollingMeshLightShader = 0;
+	}
+
 	// Release the vertex shader.
 	if (m_vertexMeshLightShader)
 	{
@@ -415,7 +430,10 @@ void ShaderInvoker::RenderShader(ID3D11DeviceContext *deviceContext, int indexCo
 #if MESHLIGHTSH
 	// Set the vertex and pixel shaders that will be used to render this triangle.
 	deviceContext->VSSetShader(m_vertexMeshLightShader, NULL, 0);
-	deviceContext->PSSetShader(m_pixelMeshLightShader, NULL, 0);
+	if (UVScrolling)
+		deviceContext->PSSetShader(m_pixelUVScrollingMeshLightShader, NULL, 0);
+	else
+		deviceContext->PSSetShader(m_pixelMeshLightShader, NULL, 0);
 	deviceContext->PSSetSamplers(0, 1, &m_samplerState);
 #endif // MESHLIGHTSH
 

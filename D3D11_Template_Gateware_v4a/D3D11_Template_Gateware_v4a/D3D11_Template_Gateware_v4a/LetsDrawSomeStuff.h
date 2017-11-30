@@ -9,6 +9,7 @@
 #include <d3d11.h>
 #include <DirectXMath.h>
 #include <dxgiformat.h> 
+#include <iostream>
 #include "DirectXTex-master\DirectXTex\DirectXTex.h"
 #include "DirectXTex-master\DDSTextureLoader\DDSTextureLoader.h"
 //#include <d3dx11tex.h>
@@ -21,7 +22,6 @@
 #include "model.h"
 #include "Grass_03.h"
 using namespace DirectX;
-
 #define COLOR false
 #define TEXTURE false
 #define MESHLIGHT true
@@ -98,6 +98,7 @@ public:
 	float nearPlane = 0.1f;
 	float farPlane = 50;
 	float zoomFOV = 4;
+	bool UVScrolling = false;
 private:
 	int GetIndexCount();
 };
@@ -505,8 +506,8 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			result = CreateDDSTextureFromFile(myDevice, L"grass_diff.dds", &m_texture3, &m_shaderResourceView3, DXGI_ALPHA_MODE_UNSPECIFIED);
 
 			if (FAILED(result))
-			{
-				cout << "Texture not work";
+			{				
+				std::cout << "Texture not work";
 			}
 			// Set the number of vertices in the vertex array.
 			m_vertexCount3 = 8989;
@@ -545,11 +546,6 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			result = myDevice->CreateBuffer(&indexBufferDesc3, &indexData3, &m_indexBuffer3);
 #pragma endregion
 
-#pragma region Mesh4
-
-
-
-#pragma endregion
 
 
 			// Create the camera object.
@@ -702,6 +698,7 @@ void LetsDrawSomeStuff::Render()
 #pragma endregion
 
 #pragma region Mesh2
+			m_ShaderInv->UVScrolling = true;
 			myContext->PSSetShaderResources(0, 1, &m_shaderResourceView2);
 			// Set the vertex buffer to active in the input assembler so it can be rendered.
 			myContext->IASetVertexBuffers(0, 1, &m_vertexBuffer2, &stride, &offset);
@@ -716,6 +713,7 @@ void LetsDrawSomeStuff::Render()
 #pragma endregion
 
 #pragma region Mesh3
+			m_ShaderInv->UVScrolling = false;
 			//Grass
 			myContext->PSSetShaderResources(0, 1, &m_shaderResourceView3);
 			// Set the vertex buffer to active in the input assembler so it can be rendered.
