@@ -128,7 +128,10 @@
     <ClInclude Include="DirectXTex-master\DirectXTex\DirectXTex.h" />
     <ClInclude Include="LetsDrawSomeStuff.h" />
     <ClInclude Include="ShaderInvoker.h" />
+    <ClInclude Include="sword1.h" />
     <ClInclude Include="test pyramid.h" />
+    <ClInclude Include="tree.h" />
+    <ClInclude Include="wall.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CameraClass.cpp" />

@@ -15,6 +15,9 @@
 #include "cameraclass.h"
 #include "ShaderInvoker.h"
 #include "test pyramid.h"
+#include "tree.h"
+#include "wall.h"
+#include "sword1.h"
 using namespace DirectX;
 
 #define COLOR false
@@ -32,15 +35,50 @@ class LetsDrawSomeStuff
 	ID3D11DeviceContext *myContext = nullptr;
 
 	// TODO: Add your own D3D11 variables here (be sure to "Release()" them when done!)
-	ID3D11Buffer *m_vertexBuffer, *m_indexBuffer;
-	int m_vertexCount, m_indexCount;
+#pragma region Mesh 1
+	ID3D11Buffer *m_vertexBuffer;
+	ID3D11Buffer *m_indexBuffer;
+	int m_vertexCount;
+	int m_indexCount;
 	ID3D11ShaderResourceView* m_shaderResourceView;
-	D3D11_SHADER_RESOURCE_VIEW_DESC m_ShaderResourceViewDesc;
+	D3D11_SHADER_RESOURCE_VIEW_DESC m_ShaderResourceViewDesc; 
 	ID3D11Resource * m_texture;
-	ID3D11Texture2D * m_textureTwoD;
+	D3D11_BUFFER_DESC vertexBufferDesc;
+	D3D11_BUFFER_DESC indexBufferDesc;
+	D3D11_SUBRESOURCE_DATA vertexData;
+	D3D11_SUBRESOURCE_DATA indexData;
+#pragma endregion
 
-	D3D11_BUFFER_DESC vertexBufferDesc, indexBufferDesc;
-	D3D11_SUBRESOURCE_DATA vertexData, indexData;
+#pragma region Mesh 2
+	ID3D11Buffer *m_vertexBuffer2;
+	ID3D11Buffer *m_indexBuffer2;
+	int m_vertexCount2;
+	int m_indexCount2;
+	D3D11_SHADER_RESOURCE_VIEW_DESC m_ShaderResourceViewDesc2;
+	ID3D11ShaderResourceView* m_shaderResourceView2;
+	ID3D11Resource * m_texture2;
+	D3D11_BUFFER_DESC vertexBufferDesc2;
+	D3D11_BUFFER_DESC indexBufferDesc2;
+	D3D11_SUBRESOURCE_DATA vertexData2;
+	D3D11_SUBRESOURCE_DATA indexData2;
+
+#pragma endregion
+
+#pragma region Mesh 3
+	ID3D11Buffer *m_vertexBuffer3;
+	ID3D11Buffer *m_indexBuffer3;
+	int m_vertexCount3;
+	int m_indexCount3;
+	D3D11_SHADER_RESOURCE_VIEW_DESC m_ShaderResourceViewDesc3;
+	ID3D11ShaderResourceView* m_shaderResourceView3;
+	ID3D11Resource * m_texture3;
+	D3D11_BUFFER_DESC vertexBufferDesc3;
+	D3D11_BUFFER_DESC indexBufferDesc3;
+	D3D11_SUBRESOURCE_DATA vertexData3;
+	D3D11_SUBRESOURCE_DATA indexData3;
+#pragma endregion
+
+
 public:
 	CameraClass* m_Camera;
 	ShaderInvoker *m_ShaderInv;
@@ -363,17 +401,20 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 #endif // 0
 
 #if MESHLIGHT
-			result = CreateDDSTextureFromFile(myDevice, L"Pyramid.dds", &m_texture, &m_shaderResourceView, DXGI_ALPHA_MODE_UNSPECIFIED);
+
+#pragma region Mesh1
+
+			result = CreateDDSTextureFromFile(myDevice, L"wall.dds", &m_texture, &m_shaderResourceView, DXGI_ALPHA_MODE_UNSPECIFIED);
 
 			if (FAILED(result))
 			{
 				cout << "Texture not work";
 			}
 			// Set the number of vertices in the vertex array.
-			m_vertexCount = 768;
+			m_vertexCount = 776;
 
-			// Set the number of indices in the index array.
-			m_indexCount = 1674;
+			// Set the number of indices for the tree
+			m_indexCount = 1692;
 
 			// Set up the description of the static vertex buffer.
 			vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
@@ -384,7 +425,7 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			vertexBufferDesc.StructureByteStride = 0;
 
 			// Give the subresource structure a pointer to the vertex data.
-			vertexData.pSysMem = test_pyramid_data;
+			vertexData.pSysMem = wall_data;
 			vertexData.SysMemPitch = 0;
 			vertexData.SysMemSlicePitch = 0;
 
@@ -393,19 +434,109 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 
 			// Set up the description of the static index buffer.
 			indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-			indexBufferDesc.ByteWidth = sizeof(unsigned int) * m_indexCount;
+			indexBufferDesc.ByteWidth = sizeof(unsigned int) * (m_indexCount);
 			indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 			indexBufferDesc.CPUAccessFlags = 0;
 			indexBufferDesc.MiscFlags = 0;
 			indexBufferDesc.StructureByteStride = 0;
 
 			// Give the subresource structure a pointer to the index data.
-			indexData.pSysMem = test_pyramid_indicies;
+			indexData.pSysMem = wall_indicies;
 			indexData.SysMemPitch = 0;
 			indexData.SysMemSlicePitch = 0;
-
 			// Create the index buffer.
 			result = myDevice->CreateBuffer(&indexBufferDesc, &indexData, &m_indexBuffer);
+
+#pragma endregion
+
+#pragma region Mesh2
+			result = CreateDDSTextureFromFile(myDevice, L"Pyramid.dds", &m_texture2, &m_shaderResourceView2, DXGI_ALPHA_MODE_UNSPECIFIED);
+
+			if (FAILED(result))
+			{
+				cout << "Texture not work";
+			}
+			// Set the number of vertices in the vertex array.
+			m_vertexCount2 = 768;
+
+			// Set the number of indices for the pyramid
+			m_indexCount2 = 1674;
+
+			// Set up the description of the static vertex buffer.
+			vertexBufferDesc2.Usage = D3D11_USAGE_DEFAULT;
+			vertexBufferDesc2.ByteWidth = sizeof(_OBJ_VERT_) * m_vertexCount2;
+			vertexBufferDesc2.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+			vertexBufferDesc2.CPUAccessFlags = 0;
+			vertexBufferDesc2.MiscFlags = 0;
+			vertexBufferDesc2.StructureByteStride = 0;
+
+			// Give the subresource structure a pointer to the vertex data.
+			vertexData2.pSysMem = test_pyramid_data;
+			vertexData2.SysMemPitch = 0;
+			vertexData2.SysMemSlicePitch = 0;
+
+			// Now create the vertex buffer.
+			result = myDevice->CreateBuffer(&vertexBufferDesc2, &vertexData2, &m_vertexBuffer2);
+
+			// Set up the description of the static index buffer.
+			indexBufferDesc2.Usage = D3D11_USAGE_DEFAULT;
+			indexBufferDesc2.ByteWidth = sizeof(unsigned int) * (m_indexCount2);
+			indexBufferDesc2.BindFlags = D3D11_BIND_INDEX_BUFFER;
+			indexBufferDesc2.CPUAccessFlags = 0;
+			indexBufferDesc2.MiscFlags = 0;
+			indexBufferDesc2.StructureByteStride = 0;
+
+			indexData2.pSysMem = test_pyramid_indicies;
+			indexData2.SysMemPitch = 0;
+			indexData2.SysMemSlicePitch = 0;
+			// Create the index buffer.
+			result = myDevice->CreateBuffer(&indexBufferDesc2, &indexData2, &m_indexBuffer2);
+#pragma endregion
+
+#pragma region Mesh3
+			result = CreateDDSTextureFromFile(myDevice, L"Greatsword.dds", &m_texture3, &m_shaderResourceView3, DXGI_ALPHA_MODE_UNSPECIFIED);
+
+			if (FAILED(result))
+			{
+				cout << "Texture not work";
+			}
+			// Set the number of vertices in the vertex array.
+			m_vertexCount3 = 1746;
+
+			// Set the number of indices for the pyramid
+			m_indexCount3 = 5676;
+
+			// Set up the description of the static vertex buffer.
+			vertexBufferDesc3.Usage = D3D11_USAGE_DEFAULT;
+			vertexBufferDesc3.ByteWidth = sizeof(_OBJ_VERT_) * m_vertexCount3;
+			vertexBufferDesc3.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+			vertexBufferDesc3.CPUAccessFlags = 0;
+			vertexBufferDesc3.MiscFlags = 0;
+			vertexBufferDesc3.StructureByteStride = 0;
+
+			// Give the subresource structure a pointer to the vertex data.
+			vertexData3.pSysMem = sword1_data;
+			vertexData3.SysMemPitch = 0;
+			vertexData3.SysMemSlicePitch = 0;
+
+			// Now create the vertex buffer.
+			result = myDevice->CreateBuffer(&vertexBufferDesc3, &vertexData3, &m_vertexBuffer3);
+
+			// Set up the description of the static index buffer.
+			indexBufferDesc3.Usage = D3D11_USAGE_DEFAULT;
+			indexBufferDesc3.ByteWidth = sizeof(unsigned int) * (m_indexCount3);
+			indexBufferDesc3.BindFlags = D3D11_BIND_INDEX_BUFFER;
+			indexBufferDesc3.CPUAccessFlags = 0;
+			indexBufferDesc3.MiscFlags = 0;
+			indexBufferDesc3.StructureByteStride = 0;
+
+			indexData3.pSysMem = sword1_indicies;
+			indexData3.SysMemPitch = 0;
+			indexData3.SysMemSlicePitch = 0;
+			// Create the index buffer.
+			result = myDevice->CreateBuffer(&indexBufferDesc3, &indexData3, &m_indexBuffer3);
+#pragma endregion
+
 
 			// Create the camera object.
 			m_Camera = new CameraClass;
@@ -482,7 +613,7 @@ void LetsDrawSomeStuff::Render()
 			ID3D11RenderTargetView* const targets[] = { myRenderTargetView };
 			myContext->OMSetRenderTargets(1, targets, myDepthStencilView);
 
-			// Clear the screen to black
+			// Clear screen to black
 			const float black[] = { 0, 0, 1, 1 };
 			myContext->ClearRenderTargetView(myRenderTargetView, black);
 			
@@ -498,7 +629,7 @@ void LetsDrawSomeStuff::Render()
 
 #if MESHLIGHT
 			// Set vertex buffer stride and offset.
-			stride = sizeof(MyMeshLightVertex);
+			stride = sizeof(_OBJ_VERT_);
 			offset = 0;
 
 
@@ -519,6 +650,24 @@ void LetsDrawSomeStuff::Render()
 
 #endif // COLOR
 
+			//// Set the vertex buffer to active in the input assembler so it can be rendered.
+			//myContext->IASetVertexBuffers(0, 1, &m_vertexBuffer, &stride, &offset);
+
+			//// Set the index buffer to active in the input assembler so it can be rendered.
+			//myContext->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+
+			//// Set the type of primitive that should be rendered from this vertex buffer, in this case triangles.
+			//myContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+#pragma endregion
+
+			//Set up matrices
+			worldMatrix = DirectX::XMMatrixIdentity();
+			m_Camera->GetViewMatrix(viewMatrix);
+			projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(3.14f / 4.0f, 1024 / 768, 0.1f, 600);
+			
+#pragma region Mesh1
+			myContext->PSSetShaderResources(0, 1, &m_shaderResourceView);
 			// Set the vertex buffer to active in the input assembler so it can be rendered.
 			myContext->IASetVertexBuffers(0, 1, &m_vertexBuffer, &stride, &offset);
 
@@ -527,18 +676,40 @@ void LetsDrawSomeStuff::Render()
 
 			// Set the type of primitive that should be rendered from this vertex buffer, in this case triangles.
 			myContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			//Individual Object worldMatrix
+			worldMatrix = XMMatrixRotationRollPitchYaw(90, 0, 0);
+			//INDEXCOUNT, INDEXOFFSET
+			m_ShaderInv->Render(myContext, m_vertexCount, 0, worldMatrix, viewMatrix, projectionMatrix);
 
 #pragma endregion
 
-			worldMatrix = DirectX::XMMatrixIdentity();
-			m_Camera->GetViewMatrix(viewMatrix);
-			projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(3.14f / 4.0f, 1024 / 768, 0.1f, 10);
-			myContext->PSSetShaderResources(0, 1, &m_shaderResourceView);
-			//worldMatrix = XMMatrixRotationRollPitchYaw(rotation, 0, 0);
-			worldMatrix = XMMatrixScaling(3, 3, 3);
-			m_ShaderInv->Render(myContext, GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
-			worldMatrix = XMMatrixTranslation(translation, 0, 0);
-			m_ShaderInv->Render(myContext, GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+#pragma region Mesh2
+			myContext->PSSetShaderResources(0, 1, &m_shaderResourceView2);
+			// Set the vertex buffer to active in the input assembler so it can be rendered.
+			myContext->IASetVertexBuffers(0, 1, &m_vertexBuffer2, &stride, &offset);
+
+			// Set the index buffer to active in the input assembler so it can be rendered.
+			myContext->IASetIndexBuffer(m_indexBuffer2, DXGI_FORMAT_R32_UINT, 0);
+
+			// Set the index buffer to active in the input assembler so it can be rendered.
+			worldMatrix = XMMatrixTranslation(4, 0, 0);
+			m_ShaderInv->Render(myContext, m_indexCount2, 0, worldMatrix, viewMatrix, projectionMatrix);
+
+#pragma endregion
+
+#pragma region Mesh3
+			myContext->PSSetShaderResources(0, 1, &m_shaderResourceView3);
+			// Set the vertex buffer to active in the input assembler so it can be rendered.
+			myContext->IASetVertexBuffers(0, 1, &m_vertexBuffer3, &stride, &offset);
+
+			// Set the index buffer to active in the input assembler so it can be rendered.
+			myContext->IASetIndexBuffer(m_indexBuffer3, DXGI_FORMAT_R32_UINT, 0);
+
+			// Set the index buffer to active in the input assembler so it can be rendered.
+			worldMatrix = XMMatrixTranslation(-4, 0, 0);
+			m_ShaderInv->Render(myContext, m_indexCount3, 0, worldMatrix, viewMatrix, projectionMatrix);
+#pragma endregion
+
 
 			// Present Backbuffer using Swapchain object
 			// Framerate is currently unlocked, we suggest "MSI Afterburner" to track your current FPS and memory usage.
