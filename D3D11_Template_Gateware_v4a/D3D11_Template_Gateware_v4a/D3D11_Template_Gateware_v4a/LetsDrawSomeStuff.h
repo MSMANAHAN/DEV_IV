@@ -561,23 +561,23 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 #pragma endregion
 
 #pragma region Mesh4
-			MyMeshLightVertex circleArr[361];
+			MyMeshLightVertex spiralArr[361];
 			unsigned int indicies[361];
 			//circle array initialization
 			for (int i = 0; i < 361; i++)
 			{
-				circleArr[i].normals.x = 0;
-				circleArr[i].normals.y = 0;
-				circleArr[i].normals.z = 0;
+				spiralArr[i].normals.x = 0;
+				spiralArr[i].normals.y = 0;
+				spiralArr[i].normals.z = 0;
 
-				circleArr[i].UVW.x = 0;
-				circleArr[i].UVW.y = 0;
-				circleArr[i].UVW.z = 0;
+				spiralArr[i].UVW.x = 0;
+				spiralArr[i].UVW.y = 0;
+				spiralArr[i].UVW.z = 0;
 
-				circleArr[i].position.x = 0.95f *sin(XMConvertToRadians(i));
-				circleArr[i].position.y = 0.95f *cos(XMConvertToRadians(i));
-				circleArr[i].position.z = 1;
-				circleArr[i].position.w = 1;
+				spiralArr[i].position.x = 0.95f *sin(XMConvertToRadians(i));
+				spiralArr[i].position.y = 0.95f *cos(XMConvertToRadians(i));
+				spiralArr[i].position.z = 1;
+				spiralArr[i].position.w = 1;
 				indicies[i] = i;
 			}
 
@@ -596,7 +596,7 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			vertexBufferDesc4.StructureByteStride = 0;
 
 			// Give the subresource structure a pointer to the vertex data.
-			vertexData4.pSysMem = circleArr;
+			vertexData4.pSysMem = spiralArr;
 			vertexData4.SysMemPitch = 0;
 			vertexData4.SysMemSlicePitch = 0;
 
@@ -629,7 +629,7 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			m_ShaderInv->Initialize(myDevice);
 
 			m_lightDir = XMFLOAT3(1, 0, 0);
-			m_diffuseColor = XMFLOAT4(1, 1, 1, 1);
+			m_diffuseColor = XMFLOAT4(1, 0, 0, 1);
 #endif // MESHLIGHT
 
 		}
@@ -751,6 +751,9 @@ void LetsDrawSomeStuff::Render()
 			m_Camera->GetViewMatrix(viewMatrix);
 			projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(3.14f / zoomFOV, 1024 / 768, nearPlane, farPlane);
 			
+			m_lightDir = XMFLOAT3(translation, 0, 0);
+			m_diffuseColor = XMFLOAT4(1, 0, 0, 1);
+
 #pragma region Mesh1
 			myContext->PSSetShaderResources(0, 1, &m_shaderResourceView);
 			// Set the vertex buffer to active in the input assembler so it can be rendered.
