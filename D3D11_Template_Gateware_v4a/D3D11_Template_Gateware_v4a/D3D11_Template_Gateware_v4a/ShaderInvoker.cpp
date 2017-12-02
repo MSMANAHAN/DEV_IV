@@ -36,7 +36,7 @@ void ShaderInvoker::Shutdown()
 {
 }
 
-bool ShaderInvoker::Render(ID3D11DeviceContext *deviceContext, int indexCount, int indexOffset, 
+bool ShaderInvoker::Render(ID3D11DeviceContext *deviceContext, int indexCount, int indexOffset, int instanceCount,
 	XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix, 
 	XMFLOAT3 lightDirection, XMFLOAT4 diffuseColor)
 {
@@ -50,7 +50,7 @@ bool ShaderInvoker::Render(ID3D11DeviceContext *deviceContext, int indexCount, i
 	}
 
 	// Now render the prepared buffers with the shader.
-	RenderShader(deviceContext, indexCount, indexOffset);
+	RenderShader(deviceContext, indexCount, indexOffset, instanceCount);
 
 	return true;
 }
@@ -197,6 +197,7 @@ bool ShaderInvoker::InitializeShader(ID3D11Device* device)
 		{ "POSITION",	0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "TEXCOORD",	0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "NORMAL",		0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD",	1, DXGI_FORMAT_R32G32B32_FLOAT, 1, 0, D3D11_INPUT_PER_INSTANCE_DATA, 1 }
 	};
 
 	// Get a count of the elements in the layout.
@@ -409,7 +410,7 @@ bool ShaderInvoker::SetShaderParameters(ID3D11DeviceContext* deviceContext, XMMA
 	return true;
 }
 
-void ShaderInvoker::RenderShader(ID3D11DeviceContext *deviceContext, int indexCount, int indexOffset)
+void ShaderInvoker::RenderShader(ID3D11DeviceContext *deviceContext, int indexCount, int indexOffset, int instanceCount)
 {
 	// Set the vertex input layout.
 	deviceContext->IASetInputLayout(m_layout);
@@ -438,7 +439,14 @@ void ShaderInvoker::RenderShader(ID3D11DeviceContext *deviceContext, int indexCo
 #endif // MESHLIGHTSH
 
 	// Render the triangle.
-	deviceContext->DrawIndexed(indexCount, indexOffset, 0);
-
+	if (instanceRendering)
+	{
+		deviceContext->DrawIndexedInstanced(indexCount, 20, 0, 0, 0);
+	}
+	else
+		deviceContext->DrawIndexed(indexCount, indexOffset, 0);
+	
+	
+	
 	return;
 }

@@ -44,15 +44,16 @@ public:
 
 	bool Initialize(ID3D11Device*);
 	void Shutdown();
-	bool Render(ID3D11DeviceContext*, int, int, XMMATRIX, XMMATRIX, XMMATRIX, XMFLOAT3, XMFLOAT4);
+	bool Render(ID3D11DeviceContext*, int, int, int, XMMATRIX, XMMATRIX, XMMATRIX, XMFLOAT3, XMFLOAT4);
 	bool UVScrolling = false;
+	bool instanceRendering = false;
 
 private:
 	bool InitializeShader(ID3D11Device*);
 	void ShutdownShader();
 
 	bool SetShaderParameters(ID3D11DeviceContext*, XMMATRIX, XMMATRIX, XMMATRIX, XMFLOAT3, XMFLOAT4);
-	void RenderShader(ID3D11DeviceContext*, int, int);
+	void RenderShader(ID3D11DeviceContext*, int, int, int);
 
 private:
 	ID3D11VertexShader* m_vertexShader;

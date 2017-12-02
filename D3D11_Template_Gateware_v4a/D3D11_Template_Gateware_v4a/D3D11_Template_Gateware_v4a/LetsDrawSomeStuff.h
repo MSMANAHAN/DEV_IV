@@ -38,6 +38,9 @@ class LetsDrawSomeStuff
 
 	XMFLOAT4 m_diffuseColor;
 	XMFLOAT3 m_lightDir;
+	ID3D11Buffer* m_instanceBuffer;
+	int m_instanceCount;
+
 
 	// TODO: Add your own D3D11 variables here (be sure to "Release()" them when done!)
 #pragma region Mesh 1
@@ -145,6 +148,11 @@ struct MyMeshLightVertex
 	XMFLOAT4 position;
 	XMFLOAT3 UVW;
 	XMFLOAT3 normals;
+};
+
+struct InstanceType
+{
+	XMFLOAT3 position;
 };
 
 // Init
@@ -517,6 +525,12 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 #pragma endregion
 
 #pragma region Mesh3
+
+			InstanceType* instances;
+			D3D11_BUFFER_DESC vertexBufferDesc, instanceBufferDesc;
+			D3D11_SUBRESOURCE_DATA vertexData, instanceData;
+			// Set the number of instances in the array.
+			m_instanceCount = 100;
 			result = CreateDDSTextureFromFile(myDevice, L"grass_diff.dds", &m_texture3, &m_shaderResourceView3, DXGI_ALPHA_MODE_UNSPECIFIED);
 
 			if (FAILED(result))
@@ -558,6 +572,38 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			indexData3.SysMemSlicePitch = 0;
 			// Create the index buffer.
 			result = myDevice->CreateBuffer(&indexBufferDesc3, &indexData3, &m_indexBuffer3);
+
+			// Create the instance buffer.
+			instances = new InstanceType[m_instanceCount];
+			// Load the instance array with data.
+			float xGrass = 0;
+			float ZGrassReal = 0;
+			for (size_t i = 0; i < m_instanceCount; i++)
+			{
+				xGrass += 1.5f;
+				ZGrassReal += 1.5f;
+				if (i % 2 == 0)				
+					instances[i].position = XMFLOAT3(-xGrass, 0, ZGrassReal);				
+				else
+					instances[i].position = XMFLOAT3(xGrass, 0, ZGrassReal);
+
+			}
+
+			// Set up the description of the instance buffer.
+			instanceBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+			instanceBufferDesc.ByteWidth = sizeof(InstanceType) * m_instanceCount;
+			instanceBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+			instanceBufferDesc.CPUAccessFlags = 0;
+			instanceBufferDesc.MiscFlags = 0;
+			instanceBufferDesc.StructureByteStride = 0;
+
+			// Give the subresource structure a pointer to the instance data.
+			instanceData.pSysMem = instances;
+			instanceData.SysMemPitch = 0;
+			instanceData.SysMemSlicePitch = 0;
+
+			// Create the instance buffer.
+			result = myDevice->CreateBuffer(&instanceBufferDesc, &instanceData, &m_instanceBuffer);
 #pragma endregion
 
 #pragma region Mesh4
@@ -630,6 +676,10 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 
 			m_lightDir = XMFLOAT3(1, 0, 0);
 			m_diffuseColor = XMFLOAT4(1, 0, 0, 1);
+
+			// Release the instance array now that the instance buffer has been created and loaded.
+			delete[] instances;
+			instances = 0;
 #endif // MESHLIGHT
 
 		}
@@ -666,6 +716,12 @@ LetsDrawSomeStuff::~LetsDrawSomeStuff()
 		m_vertexBuffer = 0;
 	}
 
+	if (m_instanceBuffer)
+	{
+		m_instanceBuffer->Release();
+		m_instanceBuffer = 0;
+	}
+
 	if (m_Camera)
 	{
 		delete m_Camera;
@@ -699,7 +755,7 @@ void LetsDrawSomeStuff::Render()
 			myContext->OMSetRenderTargets(1, targets, myDepthStencilView);
 
 			// Clear screen to black
-			const float black[] = { .5f, .05f, .5f, 1 };
+			const float black[] = { .5f, .5f, .5f, 1 };
 			myContext->ClearRenderTargetView(myRenderTargetView, black);
 			
 			// TODO: Set your shaders, Update & Set your constant buffers, Attatch your vertex & index buffers, Set your InputLayout & Topology & Draw!
@@ -767,7 +823,7 @@ void LetsDrawSomeStuff::Render()
 			//Individual Object worldMatrix
 			worldMatrix = XMMatrixMultiply(XMMatrixTranslation(0.0f, -05.0f, -0.0f), XMMatrixRotationRollPitchYaw(90, 0, 0));
 			//INDEXCOUNT, INDEXOFFSET
-			m_ShaderInv->Render(myContext, m_vertexCount, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+			m_ShaderInv->Render(myContext, m_vertexCount, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
 
 #pragma endregion
 
@@ -782,51 +838,43 @@ void LetsDrawSomeStuff::Render()
 
 			// Set the index buffer to active in the input assembler so it can be rendered.
 			worldMatrix = XMMatrixMultiply(XMMatrixScaling(45, 45, 45),XMMatrixTranslation(translation, 4, 60));
-			m_ShaderInv->Render(myContext, m_indexCount2, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+			m_ShaderInv->Render(myContext, m_indexCount2, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
 
 #pragma endregion
 
 #pragma region Mesh3
+			unsigned int strides[2];
+			unsigned int offsets[2];
+			ID3D11Buffer* bufferPointers[2];
+			m_ShaderInv->instanceRendering = true;
+			// Set the buffer strides.
+			strides[0] = sizeof(_OBJ_VERT_);
+			strides[1] = sizeof(InstanceType);
+
+			// Set the buffer offsets.
+			offsets[0] = 0;
+			offsets[1] = 0;
+			// Set the array of pointers to the vertex and instance buffers.
+			bufferPointers[0] = m_vertexBuffer3;
+			bufferPointers[1] = m_instanceBuffer;
 			m_ShaderInv->UVScrolling = false;
+			m_ShaderInv->instanceRendering = true;
+
 			//Grass
 			myContext->PSSetShaderResources(0, 1, &m_shaderResourceView3);
 			// Set the vertex buffer to active in the input assembler so it can be rendered.
-			myContext->IASetVertexBuffers(0, 1, &m_vertexBuffer3, &stride, &offset);
+			myContext->IASetVertexBuffers(0, 2, bufferPointers, strides, offsets);
 
 			// Set the index buffer to active in the input assembler so it can be rendered.
 			myContext->IASetIndexBuffer(m_indexBuffer3, DXGI_FORMAT_R32_UINT, 0);
-			float zGrass = -10.0f;
-
-			for (unsigned int i = 0; i < 25; i++)
-			{
-				// Set the index buffer to active in the input assembler so it can be rendered.
-				worldMatrix = XMMatrixMultiply(XMMatrixTranslation(0.0f, -0.0f, zGrass), XMMatrixScaling(1.0f, 1.0f, 1.0f));
-				m_ShaderInv->Render(myContext, m_indexCount3, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
-				zGrass += 2.5f;
-			}
-			float xgrass = zGrass /2;
-			zGrass = -10.0f;
-			for (unsigned int i = 0; i < 25; i++)
-			{
-				// Set the index buffer to active in the input assembler so it can be rendered.
-				worldMatrix = XMMatrixMultiply(XMMatrixTranslation(xgrass, -0.0f, zGrass), XMMatrixScaling(1.0f, 1.0f, 1.0f));
-				m_ShaderInv->Render(myContext, m_indexCount3, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
-				zGrass += 2.5f;
-			}
-
-			zGrass = -10.0f;
-			for (unsigned int i = 0; i < 25; i++)
-			{
-				// Set the index buffer to active in the input assembler so it can be rendered.
-				worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-xgrass, -0.0f, zGrass), XMMatrixScaling(1.0f, 1.0f, 1.0f));
-				m_ShaderInv->Render(myContext, m_indexCount3, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
-				zGrass += 2.5f;
-			}
+			worldMatrix = XMMatrixMultiply(XMMatrixTranslation(0, -0.0f, 0), XMMatrixScaling(1.0f, 1.0f, 1.0f));
+			m_ShaderInv->Render(myContext, m_indexCount3, 0, m_instanceCount, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+			m_ShaderInv->instanceRendering = false;
 #pragma endregion
 
 #pragma region Mesh4
-			//myContext->PSSetShaderResources(0, 1, &m_shaderResourceView4);
-			// Set the vertex buffer to active in the input assembler so it can be rendered.
+			myContext->PSSetShaderResources(0, 1, &m_shaderResourceView4);
+//			 Set the vertex buffer to active in the input assembler so it can be rendered.
 			myContext->IASetVertexBuffers(0, 1, &m_vertexBuffer4, &stride, &offset);
 
 			// Set the index buffer to active in the input assembler so it can be rendered.
@@ -837,7 +885,7 @@ void LetsDrawSomeStuff::Render()
 
 			// Set the index buffer to active in the input assembler so it can be rendered.
 			worldMatrix = XMMatrixMultiply(XMMatrixScaling(45, 45, 45), XMMatrixTranslation(-translation, 4, 60));
-			m_ShaderInv->Render(myContext, m_indexCount4, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+			m_ShaderInv->Render(myContext, m_indexCount4, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
 #pragma endregion
 
 
