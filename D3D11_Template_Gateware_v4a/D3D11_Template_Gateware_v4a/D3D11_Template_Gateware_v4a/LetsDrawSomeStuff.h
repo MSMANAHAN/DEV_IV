@@ -21,6 +21,8 @@
 #include "sword1.h"
 #include "model.h"
 #include "Grass_03.h"
+#include "Rope Bridge.h"
+#include "chevalier.h"
 using namespace DirectX;
 #define COLOR false
 #define TEXTURE false
@@ -98,6 +100,34 @@ class LetsDrawSomeStuff
 	D3D11_BUFFER_DESC indexBufferDesc4;
 	D3D11_SUBRESOURCE_DATA vertexData4;
 	D3D11_SUBRESOURCE_DATA indexData4;
+#pragma endregion
+
+#pragma region Mesh5
+	ID3D11Buffer *m_vertexBuffer5;
+	ID3D11Buffer *m_indexBuffer5;
+	int m_vertexCount5;
+	int m_indexCount5;
+	D3D11_SHADER_RESOURCE_VIEW_DESC m_ShaderResourceViewDesc5;
+	ID3D11ShaderResourceView* m_shaderResourceView5;
+	ID3D11Resource * m_texture5;
+	D3D11_BUFFER_DESC vertexBufferDesc5;
+	D3D11_BUFFER_DESC indexBufferDesc5;
+	D3D11_SUBRESOURCE_DATA vertexData5;
+	D3D11_SUBRESOURCE_DATA indexData5;
+#pragma endregion
+
+#pragma region Mesh6
+	ID3D11Buffer *m_vertexBuffer6;
+	ID3D11Buffer *m_indexBuffer6;
+	int m_vertexCount6;
+	int m_indexCount6;
+	D3D11_SHADER_RESOURCE_VIEW_DESC m_ShaderResourceViewDesc6;
+	ID3D11ShaderResourceView* m_shaderResourceView6;
+	ID3D11Resource * m_texture6;
+	D3D11_BUFFER_DESC vertexBufferDesc6;
+	D3D11_BUFFER_DESC indexBufferDesc6;
+	D3D11_SUBRESOURCE_DATA vertexData6;
+	D3D11_SUBRESOURCE_DATA indexData6;
 #pragma endregion
 
 
@@ -530,7 +560,6 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			D3D11_BUFFER_DESC vertexBufferDesc, instanceBufferDesc;
 			D3D11_SUBRESOURCE_DATA vertexData, instanceData;
 			// Set the number of instances in the array.
-			m_instanceCount = 100;
 			result = CreateDDSTextureFromFile(myDevice, L"grass_diff.dds", &m_texture3, &m_shaderResourceView3, DXGI_ALPHA_MODE_UNSPECIFIED);
 
 			if (FAILED(result))
@@ -542,6 +571,8 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 
 			// Set the number of indices for the pyramid
 			m_indexCount3 = 18429;
+			
+			m_instanceCount = 100;
 
 			// Set up the description of the static vertex buffer.
 			vertexBufferDesc3.Usage = D3D11_USAGE_DEFAULT;
@@ -576,14 +607,28 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			// Create the instance buffer.
 			instances = new InstanceType[m_instanceCount];
 			// Load the instance array with data.
-			float xGrass = 0;
+			float xGrass = 3;
 			float ZGrassReal = 0;
-			for (size_t i = 0; i < m_instanceCount; i++)
+			for (unsigned int i = 0; i < m_instanceCount; i++)
 			{
-				xGrass += 1.5f;
-				ZGrassReal += 1.5f;
-				if (i % 2 == 0)				
+				/*
+					         g  6  g
+					         g  5  g
+					         g  4  g
+					          g 3 g
+					          g 2 g
+					          g 1 g
+					6 5 4 3 2 1 0 1 2 3 4 5 6
+				*/
+				if (i % 10)
+				{
+					//xGrass += 1.0f;
+				}
+				if (i % 2 == 0)
+				{
+					ZGrassReal += 1.0f;
 					instances[i].position = XMFLOAT3(-xGrass, 0, ZGrassReal);				
+				}
 				else
 					instances[i].position = XMFLOAT3(xGrass, 0, ZGrassReal);
 
@@ -664,6 +709,93 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			result = myDevice->CreateBuffer(&indexBufferDesc4, &indexData4, &m_indexBuffer4);
 #pragma endregion
 
+#pragma region Mesh5
+			result = CreateDDSTextureFromFile(myDevice, L"Bridge_Plank.dds", &m_texture5, &m_shaderResourceView5, DXGI_ALPHA_MODE_UNSPECIFIED);
+
+			if (FAILED(result))
+			{
+				cout << "Texture not work";
+			}
+			// Set the number of vertices in the vertex array.
+			m_vertexCount5 = 3307;
+
+			// Set the number of indices for the pyramid
+			m_indexCount5 = 9936;
+
+			// Set up the description of the static vertex buffer.
+			vertexBufferDesc5.Usage = D3D11_USAGE_DEFAULT;
+			vertexBufferDesc5.ByteWidth = sizeof(_OBJ_VERT_) * m_vertexCount5;
+			vertexBufferDesc5.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+			vertexBufferDesc5.CPUAccessFlags = 0;
+			vertexBufferDesc5.MiscFlags = 0;
+			vertexBufferDesc5.StructureByteStride = 0;
+
+			// Give the subresource structure a pointer to the vertex data.
+			vertexData5.pSysMem = Rope_Bridge_data;
+			vertexData5.SysMemPitch = 0;
+			vertexData5.SysMemSlicePitch = 0;
+
+			// Now create the vertex buffer.
+			result = myDevice->CreateBuffer(&vertexBufferDesc5, &vertexData5, &m_vertexBuffer5);
+
+			// Set up the description of the static index buffer.
+			indexBufferDesc5.Usage = D3D11_USAGE_DEFAULT;
+			indexBufferDesc5.ByteWidth = sizeof(unsigned int) * (m_indexCount5);
+			indexBufferDesc5.BindFlags = D3D11_BIND_INDEX_BUFFER;
+			indexBufferDesc5.CPUAccessFlags = 0;
+			indexBufferDesc5.MiscFlags = 0;
+			indexBufferDesc5.StructureByteStride = 0;
+
+			indexData5.pSysMem = Rope_Bridge_indicies;
+			indexData5.SysMemPitch = 0;
+			indexData5.SysMemSlicePitch = 0;
+			// Create the index buffer.
+			result = myDevice->CreateBuffer(&indexBufferDesc5, &indexData5, &m_indexBuffer5);
+#pragma endregion
+
+#pragma region Mesh6
+			result = CreateDDSTextureFromFile(myDevice, L"chevalier.dds", &m_texture6, &m_shaderResourceView6, DXGI_ALPHA_MODE_UNSPECIFIED);
+
+			if (FAILED(result))
+			{
+				cout << "Texture not work";
+			}
+			// Set the number of vertices in the vertex array.
+			m_vertexCount6 = 1211;
+
+			// Set the number of indices for the pyramid
+			m_indexCount6 = 2922;
+
+			// Set up the description of the static vertex buffer.
+			vertexBufferDesc6.Usage = D3D11_USAGE_DEFAULT;
+			vertexBufferDesc6.ByteWidth = sizeof(_OBJ_VERT_) * m_vertexCount6;
+			vertexBufferDesc6.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+			vertexBufferDesc6.CPUAccessFlags = 0;
+			vertexBufferDesc6.MiscFlags = 0;
+			vertexBufferDesc6.StructureByteStride = 0;
+
+			// Give the subresource structure a pointer to the vertex data.
+			vertexData6.pSysMem = chevalier_data;
+			vertexData6.SysMemPitch = 0;
+			vertexData6.SysMemSlicePitch = 0;
+
+			// Now create the vertex buffer.
+			result = myDevice->CreateBuffer(&vertexBufferDesc6, &vertexData6, &m_vertexBuffer6);
+
+			// Set up the description of the static index buffer.
+			indexBufferDesc6.Usage = D3D11_USAGE_DEFAULT;
+			indexBufferDesc6.ByteWidth = sizeof(unsigned int) * (m_indexCount6);
+			indexBufferDesc6.BindFlags = D3D11_BIND_INDEX_BUFFER;
+			indexBufferDesc6.CPUAccessFlags = 0;
+			indexBufferDesc6.MiscFlags = 0;
+			indexBufferDesc6.StructureByteStride = 0;
+
+			indexData6.pSysMem = chevalier_indicies;
+			indexData6.SysMemPitch = 0;
+			indexData6.SysMemSlicePitch = 0;
+			// Create the index buffer.
+			result = myDevice->CreateBuffer(&indexBufferDesc6, &indexData6, &m_indexBuffer6);
+#pragma endregion
 
 			// Create the camera object.
 			m_Camera = new CameraClass;
@@ -808,7 +940,7 @@ void LetsDrawSomeStuff::Render()
 			projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(3.14f / zoomFOV, 1024 / 768, nearPlane, farPlane);
 			
 			m_lightDir = XMFLOAT3(translation, 0, 0);
-			m_diffuseColor = XMFLOAT4(1, 0, 0, 1);
+			m_diffuseColor = XMFLOAT4(1, 1, 1, 1);
 
 #pragma region Mesh1
 			myContext->PSSetShaderResources(0, 1, &m_shaderResourceView);
@@ -821,7 +953,7 @@ void LetsDrawSomeStuff::Render()
 			// Set the type of primitive that should be rendered from this vertex buffer, in this case triangles.
 			myContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 			//Individual Object worldMatrix
-			worldMatrix = XMMatrixMultiply(XMMatrixTranslation(0.0f, -05.0f, -0.0f), XMMatrixRotationRollPitchYaw(90, 0, 0));
+			worldMatrix = XMMatrixMultiply(XMMatrixTranslation(3.0f, -05.0f, -0.0f), XMMatrixRotationRollPitchYaw(90, 0, 0));
 			//INDEXCOUNT, INDEXOFFSET
 			m_ShaderInv->Render(myContext, m_vertexCount, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
 
@@ -837,7 +969,7 @@ void LetsDrawSomeStuff::Render()
 			myContext->IASetIndexBuffer(m_indexBuffer2, DXGI_FORMAT_R32_UINT, 0);
 
 			// Set the index buffer to active in the input assembler so it can be rendered.
-			worldMatrix = XMMatrixMultiply(XMMatrixScaling(45, 45, 45),XMMatrixTranslation(translation, 4, 60));
+			worldMatrix = XMMatrixMultiply(XMMatrixScaling(45, 45, 45), XMMatrixTranslation(140 + translation, 4, 60));
 			m_ShaderInv->Render(myContext, m_indexCount2, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
 
 #pragma endregion
@@ -872,6 +1004,35 @@ void LetsDrawSomeStuff::Render()
 			m_ShaderInv->instanceRendering = false;
 #pragma endregion
 
+#pragma region Mesh5
+			myContext->PSSetShaderResources(0, 1, &m_shaderResourceView5);
+			// Set the vertex buffer to active in the input assembler so it can be rendered.
+			myContext->IASetVertexBuffers(0, 1, &m_vertexBuffer5, &stride, &offset);
+
+			// Set the index buffer to active in the input assembler so it can be rendered.
+			myContext->IASetIndexBuffer(m_indexBuffer5, DXGI_FORMAT_R32_UINT, 0);
+
+			// Set the index buffer to active in the input assembler so it can be rendered.
+			worldMatrix = XMMatrixMultiply(XMMatrixScaling(3, 3, 3), XMMatrixTranslation(0, 8, 140));
+			m_ShaderInv->Render(myContext, m_indexCount5, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+
+#pragma endregion
+
+#pragma region Mesh6
+			myContext->PSSetShaderResources(0, 1, &m_shaderResourceView6);
+			// Set the vertex buffer to active in the input assembler so it can be rendered.
+			myContext->IASetVertexBuffers(0, 1, &m_vertexBuffer6, &stride, &offset);
+
+			// Set the index buffer to active in the input assembler so it can be rendered.
+			myContext->IASetIndexBuffer(m_indexBuffer6, DXGI_FORMAT_R32_UINT, 0);
+
+			// Set the index buffer to active in the input assembler so it can be rendered.
+			worldMatrix = XMMatrixMultiply(XMMatrixScaling(6, 6, 6), XMMatrixTranslation(5, 9, 70));
+			m_ShaderInv->Render(myContext, m_indexCount6, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+
+#pragma endregion
+
+
 #pragma region Mesh4
 			myContext->PSSetShaderResources(0, 1, &m_shaderResourceView4);
 //			 Set the vertex buffer to active in the input assembler so it can be rendered.
@@ -887,6 +1048,7 @@ void LetsDrawSomeStuff::Render()
 			worldMatrix = XMMatrixMultiply(XMMatrixScaling(45, 45, 45), XMMatrixTranslation(-translation, 4, 60));
 			m_ShaderInv->Render(myContext, m_indexCount4, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
 #pragma endregion
+
 
 
 			// Present Backbuffer using Swapchain object

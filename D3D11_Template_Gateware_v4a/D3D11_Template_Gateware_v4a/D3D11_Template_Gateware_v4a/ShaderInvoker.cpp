@@ -441,7 +441,7 @@ void ShaderInvoker::RenderShader(ID3D11DeviceContext *deviceContext, int indexCo
 	// Render the triangle.
 	if (instanceRendering)
 	{
-		deviceContext->DrawIndexedInstanced(indexCount, 20, 0, 0, 0);
+		deviceContext->DrawIndexedInstanced(indexCount, instanceCount, 0, 0, 0);
 	}
 	else
 		deviceContext->DrawIndexed(indexCount, indexOffset, 0);
