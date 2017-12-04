@@ -174,6 +174,14 @@ bool ShaderInvoker::InitializeShader(ID3D11Device* device)
 	}
 
 
+	// Create the pixel shader from the buffer.
+	result = device->CreatePixelShader(MySkyboxMeshLightPixelShader, ARRAYSIZE(MySkyboxMeshLightPixelShader), NULL, &m_pixelSkyboxMeshLightShader);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
+
 		// Create the pixel shader from the buffer.
 		result = device->CreatePixelShader(MyUVScrollingMeshLightPixelShader, ARRAYSIZE(MyUVScrollingMeshLightPixelShader), NULL, &m_pixelUVScrollingMeshLightShader);
 		if (FAILED(result))

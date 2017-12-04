@@ -13,6 +13,7 @@
 #include "MyMeshLightVertexShader.csh"
 #include "MyMeshLightPixelShader.csh"
 #include "MyUVScrollingMeshLightPixelShader.csh"
+#include "MySkyboxMeshLightPixelShader.csh"
 
 using namespace std;
 using namespace DirectX;
@@ -62,6 +63,7 @@ private:
 	ID3D11VertexShader* m_vertexMeshLightShader;
 	ID3D11PixelShader * m_pixelMeshLightShader;
 	ID3D11PixelShader * m_pixelUVScrollingMeshLightShader;
+	ID3D11PixelShader * m_pixelSkyboxMeshLightShader;
 
 	ID3D11PixelShader* m_pixelShader;
 	ID3D11InputLayout* m_layout;

@@ -876,6 +876,9 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 				9,3,17,
 				21,11,31,
 
+				//17,3,9,
+				//31,11,21,
+
 				// Top Face
 				12,16,22,
 				26,4,25,
@@ -1168,7 +1171,8 @@ void LetsDrawSomeStuff::Render()
 						myContext->IASetIndexBuffer(m_indexBufferSky, DXGI_FORMAT_R32_UINT, 0);
 
 						// Set the index buffer to active in the input assembler so it can be rendered.
-						worldMatrix = XMMatrixMultiply(XMMatrixScaling(200, 200, 200), XMMatrixTranslation(457, 9, 70));
+						worldMatrix = XMMatrixScaling(200, 200, 200);
+						worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixTranslation(m_Camera->m_positionX + 700, m_Camera->m_positionY + 9, m_Camera->m_positionZ - 80));
 						m_ShaderInv->Render(myContext, m_indexCountSky, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
 
 			#pragma endregion
