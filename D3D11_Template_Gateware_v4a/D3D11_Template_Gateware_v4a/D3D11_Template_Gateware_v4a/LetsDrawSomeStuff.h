@@ -1171,8 +1171,7 @@ void LetsDrawSomeStuff::Render()
 						myContext->IASetIndexBuffer(m_indexBufferSky, DXGI_FORMAT_R32_UINT, 0);
 
 						// Set the index buffer to active in the input assembler so it can be rendered.
-						worldMatrix = XMMatrixScaling(200, 200, 200);
-						worldMatrix = XMMatrixMultiply(worldMatrix, XMMatrixTranslation(m_Camera->m_positionX + 700, m_Camera->m_positionY + 9, m_Camera->m_positionZ - 80));
+						worldMatrix = XMMatrixMultiply(XMMatrixScaling(800, 800, 800), XMMatrixTranslation(m_Camera->m_positionX + 2000, m_Camera->m_positionY + 9, m_Camera->m_positionZ - 160));
 						m_ShaderInv->Render(myContext, m_indexCountSky, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
 
 			#pragma endregion
