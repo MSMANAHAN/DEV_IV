@@ -819,148 +819,75 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			}
 
 			// Set the number of vertices in the vertex array.
-			m_vertexCountSky = 24;
+			m_vertexCountSky = 36;
 
 			// Set the number of indices in the index array.
 			m_indexCountSky = 36;
 			_OBJ_VERT_ cubeVerts[] =
 			{
-				_OBJ_VERT_ {-1.0f,	1.0f,-1.0f,		0.0f, 0.0f,	0.0f,	 0.0f, 0.0f,-1.0f		},//LEFT	TOP NEAR
-				_OBJ_VERT_ {1.0f,	1.0f,-1.0f,		1.0f, 0.0f,	0.0f,	 0.0f, 0.0f,-1.0f		},//RIGHT	TOP NEAR
-				_OBJ_VERT_ {-1.0f,-	1.0f,-1.0f,		0.0f, 1.0f,	0.0f,	 0.0f, 0.0f,-1.0f		},//LEFT	BOT NEAR
-				_OBJ_VERT_ {-1.0f,-	1.0f,-1.0f,		0.0f, 1.0f,	0.0f,	 0.0f, 0.0f,-1.0f		},//LEFT	BOT NEAR
-				_OBJ_VERT_ {1.0f,	1.0f,-1.0f,		1.0f, 0.0f,	0.0f,	 0.0f, 0.0f,-1.0f		},//RIGHT	TOP NEAR
-				_OBJ_VERT_ {1.0f,-	1.0f,-1.0f,		1.0f, 1.0f,	0.0f,	 0.0f, 0.0f,-1.0f		},//RIGHT	BOT NEAR
-				_OBJ_VERT_ {1.0f,	1.0f,-1.0f,		0.0f, 0.0f,	0.0f,	 1.0f, 0.0f, 0.0f		},//RIGHT	TOP NEAR
-				_OBJ_VERT_ {1.0f,	1.0f, 1.0f,		1.0f, 0.0f,	0.0f,	 1.0f, 0.0f, 0.0f,		},//RIGHT	TOP FAR
-				_OBJ_VERT_ {1.0f,-	1.0f,-1.0f,		0.0f, 1.0f,	0.0f,	 1.0f, 0.0f, 0.0f		},//RIGHT	BOT NEAR
-				_OBJ_VERT_ {1.0f,-	1.0f,-1.0f,		0.0f, 1.0f,	0.0f,	 1.0f, 0.0f, 0.0f		},//RIGHT	BOT NEAR
-				_OBJ_VERT_ {1.0f,	1.0f, 1.0f,		1.0f, 0.0f,	0.0f,	 1.0f, 0.0f, 0.0f		},//RIGHT	TOP FAR
-				_OBJ_VERT_ {1.0f,-	1.0f, 1.0f,		1.0f, 1.0f,	0.0f,	 1.0f, 0.0f, 0.0f		},//RIGHT	BOT FAR
-				_OBJ_VERT_ {1.0f,	1.0f, 1.0f,		0.0f, 0.0f,	0.0f,	 0.0f, 0.0f, 1.0f		},//RIGHT	TOP FAR
-				_OBJ_VERT_ {-1.0f,	1.0f, 1.0f,		1.0f, 0.0f,	0.0f,	 0.0f, 0.0f, 1.0f		},//LEFT	TOP FAR
-				_OBJ_VERT_ {1.0f,-	1.0f, 1.0f,		0.0f, 1.0f,	0.0f,	 0.0f, 0.0f, 1.0f		},//RIGHT	BOT FAR
-				_OBJ_VERT_ {1.0f,-	1.0f, 1.0f,		0.0f, 1.0f,	0.0f,	 0.0f, 0.0f, 1.0f		},//RIGHT	BOT FAR
-				_OBJ_VERT_ {-1.0f,	1.0f, 1.0f,		1.0f, 0.0f,	0.0f,	 0.0f, 0.0f, 1.0f		},//LEFT	TOP FAR
-				_OBJ_VERT_ {-1.0f,-	1.0f, 1.0f,		1.0f, 1.0f,	0.0f,	 0.0f, 0.0f, 1.0f		},//LEFT	BOT FAR
-				_OBJ_VERT_ {-1.0f,	1.0f, 1.0f,		0.0f, 0.0f,	0.0f,	-1.0f, 0.0f, 0.0f		},//LEFT	TOP FAR
-				_OBJ_VERT_ {-1.0f,	1.0f,-1.0f,		1.0f, 0.0f,	0.0f,	-1.0f, 0.0f, 0.0f		},//LEFT	TOP NEAR
-				_OBJ_VERT_ {-1.0f,-	1.0f, 1.0f,		0.0f, 1.0f,	0.0f,	-1.0f, 0.0f, 0.0f		},//LEFT	BOT FAR
-				_OBJ_VERT_ {-1.0f,-	1.0f, 1.0f,		0.0f, 1.0f,	0.0f,	-1.0f, 0.0f, 0.0f		},//LEFT	BOT FAR
-				_OBJ_VERT_ {-1.0f,	1.0f,-1.0f,		1.0f, 0.0f,	0.0f,	-1.0f, 0.0f, 0.0f		},//LEFT	TOP NEAR
-				_OBJ_VERT_ {-1.0f,-	1.0f,-1.0f,		1.0f, 1.0f,	0.0f,	-1.0f, 0.0f, 0.0f		},//LEFT	BOT NEAR
-				_OBJ_VERT_ {-1.0f,	1.0f, 1.0f,		0.0f, 0.0f,	0.0f,	 0.0f, 1.0f, 0.0f		},//LEFT	TOP FAR
-				_OBJ_VERT_ {1.0f,	1.0f, 1.0f,		1.0f, 0.0f,	0.0f,	 0.0f, 1.0f, 0.0f		},//RIGHT	TOP FAR
-				_OBJ_VERT_ {-1.0f,	1.0f,-1.0f,		0.0f, 1.0f,	0.0f,	 0.0f, 1.0f, 0.0f		},//LEFT	TOP NEAR
-				_OBJ_VERT_ {-1.0f,	1.0f,-1.0f,		0.0f, 1.0f,	0.0f,	 0.0f, 1.0f, 0.0f		},//LEFT	TOP NEAR
-				_OBJ_VERT_ {1.0f,	1.0f, 1.0f,		1.0f, 0.0f,	0.0f,	 0.0f, 1.0f, 0.0f		},//RIGHT	TOP FAR
-				_OBJ_VERT_ {1.0f,	1.0f,-1.0f,		1.0f, 1.0f,	0.0f,	 0.0f, 1.0f, 0.0f		},//RIGHT	TOP NEAR
-				_OBJ_VERT_ {-1.0f,-	1.0f,-1.0f,		0.0f, 0.0f,	0.0f,	 0.0f,-1.0f, 0.0f		},//LEFT	BOT NEAR
-				_OBJ_VERT_ {1.0f,-	1.0f,-1.0f,		1.0f, 0.0f,	0.0f,	 0.0f,-1.0f, 0.0f		},//RIGHT	BOT NEAR
-				_OBJ_VERT_ {-1.0f,-	1.0f, 1.0f,		0.0f, 1.0f,	0.0f,	 0.0f,-1.0f, 0.0f		},//LEFT	BOT FAR
-				_OBJ_VERT_ {-1.0f,-	1.0f, 1.0f,		0.0f, 1.0f,	0.0f,	 0.0f,-1.0f, 0.0f		},//LEFT	BOT FAR
-				_OBJ_VERT_ {1.0f,-	1.0f,-1.0f,		1.0f, 0.0f,	0.0f,	 0.0f,-1.0f, 0.0f		},//RIGHT	BOT NEAR
-				_OBJ_VERT_ {1.0f,-	1.0f, 1.0f,		1.0f, 1.0f,	0.0f,	 0.0f,-1.0f, 0.0f		} //RIGHT	BOT FAR
+				_OBJ_VERT_ {-1.0f,	1.0f,-1.0f,		0.0f, 0.0f,	0.0f,	 0.0f, 0.0f,-1.0f		},//00	LEFT	TOP NEAR
+				_OBJ_VERT_ {1.0f,	1.0f,-1.0f,		1.0f, 0.0f,	0.0f,	 0.0f, 0.0f,-1.0f		},//01	RIGHT	TOP NEAR
+				_OBJ_VERT_ {-1.0f,-	1.0f,-1.0f,		0.0f, 1.0f,	0.0f,	 0.0f, 0.0f,-1.0f		},//02	LEFT	BOT NEAR
+				_OBJ_VERT_ {-1.0f,-	1.0f,-1.0f,		0.0f, 1.0f,	0.0f,	 0.0f, 0.0f,-1.0f		},//03	LEFT	BOT NEAR
+				_OBJ_VERT_ {1.0f,	1.0f,-1.0f,		1.0f, 0.0f,	0.0f,	 0.0f, 0.0f,-1.0f		},//04	RIGHT	TOP NEAR
+				_OBJ_VERT_ {1.0f,-	1.0f,-1.0f,		1.0f, 1.0f,	0.0f,	 0.0f, 0.0f,-1.0f		},//05	RIGHT	BOT NEAR
+				_OBJ_VERT_ {1.0f,	1.0f,-1.0f,		0.0f, 0.0f,	0.0f,	 1.0f, 0.0f, 0.0f		},//06	RIGHT	TOP NEAR
+				_OBJ_VERT_ {1.0f,	1.0f, 1.0f,		1.0f, 0.0f,	0.0f,	 1.0f, 0.0f, 0.0f,		},//07	RIGHT	TOP FAR
+				_OBJ_VERT_ {1.0f,-	1.0f,-1.0f,		0.0f, 1.0f,	0.0f,	 1.0f, 0.0f, 0.0f		},//08	RIGHT	BOT NEAR
+				_OBJ_VERT_ {1.0f,-	1.0f,-1.0f,		0.0f, 1.0f,	0.0f,	 1.0f, 0.0f, 0.0f		},//09	RIGHT	BOT NEAR
+				_OBJ_VERT_ {1.0f,	1.0f, 1.0f,		1.0f, 0.0f,	0.0f,	 1.0f, 0.0f, 0.0f		},//10	RIGHT	TOP FAR
+				_OBJ_VERT_ {1.0f,-	1.0f, 1.0f,		1.0f, 1.0f,	0.0f,	 1.0f, 0.0f, 0.0f		},//11	RIGHT	BOT FAR
+				_OBJ_VERT_ {1.0f,	1.0f, 1.0f,		0.0f, 0.0f,	0.0f,	 0.0f, 0.0f, 1.0f		},//12	RIGHT	TOP FAR
+				_OBJ_VERT_ {-1.0f,	1.0f, 1.0f,		1.0f, 0.0f,	0.0f,	 0.0f, 0.0f, 1.0f		},//13	LEFT	TOP FAR
+				_OBJ_VERT_ {1.0f,-	1.0f, 1.0f,		0.0f, 1.0f,	0.0f,	 0.0f, 0.0f, 1.0f		},//14	RIGHT	BOT FAR
+				_OBJ_VERT_ {1.0f,-	1.0f, 1.0f,		0.0f, 1.0f,	0.0f,	 0.0f, 0.0f, 1.0f		},//15	RIGHT	BOT FAR
+				_OBJ_VERT_ {-1.0f,	1.0f, 1.0f,		1.0f, 0.0f,	0.0f,	 0.0f, 0.0f, 1.0f		},//16	LEFT	TOP FAR
+				_OBJ_VERT_ {-1.0f,-	1.0f, 1.0f,		1.0f, 1.0f,	0.0f,	 0.0f, 0.0f, 1.0f		},//17	LEFT	BOT FAR
+				_OBJ_VERT_ {-1.0f,	1.0f, 1.0f,		0.0f, 0.0f,	0.0f,	-1.0f, 0.0f, 0.0f		},//18	LEFT	TOP FAR
+				_OBJ_VERT_ {-1.0f,	1.0f,-1.0f,		1.0f, 0.0f,	0.0f,	-1.0f, 0.0f, 0.0f		},//19	LEFT	TOP NEAR
+				_OBJ_VERT_ {-1.0f,-	1.0f, 1.0f,		0.0f, 1.0f,	0.0f,	-1.0f, 0.0f, 0.0f		},//20	LEFT	BOT FAR
+				_OBJ_VERT_ {-1.0f,-	1.0f, 1.0f,		0.0f, 1.0f,	0.0f,	-1.0f, 0.0f, 0.0f		},//21	LEFT	BOT FAR
+				_OBJ_VERT_ {-1.0f,	1.0f,-1.0f,		1.0f, 0.0f,	0.0f,	-1.0f, 0.0f, 0.0f		},//22	LEFT	TOP NEAR
+				_OBJ_VERT_ {-1.0f,-	1.0f,-1.0f,		1.0f, 1.0f,	0.0f,	-1.0f, 0.0f, 0.0f		},//23	LEFT	BOT NEAR
+				_OBJ_VERT_ {-1.0f,	1.0f, 1.0f,		0.0f, 0.0f,	0.0f,	 0.0f, 1.0f, 0.0f		},//24	LEFT	TOP FAR
+				_OBJ_VERT_ {1.0f,	1.0f, 1.0f,		1.0f, 0.0f,	0.0f,	 0.0f, 1.0f, 0.0f		},//25	RIGHT	TOP FAR
+				_OBJ_VERT_ {-1.0f,	1.0f,-1.0f,		0.0f, 1.0f,	0.0f,	 0.0f, 1.0f, 0.0f		},//26	LEFT	TOP NEAR
+				_OBJ_VERT_ {-1.0f,	1.0f,-1.0f,		0.0f, 1.0f,	0.0f,	 0.0f, 1.0f, 0.0f		},//27	LEFT	TOP NEAR
+				_OBJ_VERT_ {1.0f,	1.0f, 1.0f,		1.0f, 0.0f,	0.0f,	 0.0f, 1.0f, 0.0f		},//28	RIGHT	TOP FAR
+				_OBJ_VERT_ {1.0f,	1.0f,-1.0f,		1.0f, 1.0f,	0.0f,	 0.0f, 1.0f, 0.0f		},//29	RIGHT	TOP NEAR
+				_OBJ_VERT_ {-1.0f,-	1.0f,-1.0f,		0.0f, 0.0f,	0.0f,	 0.0f,-1.0f, 0.0f		},//30	LEFT	BOT NEAR
+				_OBJ_VERT_ {1.0f,-	1.0f,-1.0f,		1.0f, 0.0f,	0.0f,	 0.0f,-1.0f, 0.0f		},//31	RIGHT	BOT NEAR
+				_OBJ_VERT_ {-1.0f,-	1.0f, 1.0f,		0.0f, 1.0f,	0.0f,	 0.0f,-1.0f, 0.0f		},//32	LEFT	BOT FAR
+				_OBJ_VERT_ {-1.0f,-	1.0f, 1.0f,		0.0f, 1.0f,	0.0f,	 0.0f,-1.0f, 0.0f		},//33	LEFT	BOT FAR
+				_OBJ_VERT_ {1.0f,-	1.0f,-1.0f,		1.0f, 0.0f,	0.0f,	 0.0f,-1.0f, 0.0f		},//34	RIGHT	BOT NEAR
+				_OBJ_VERT_ {1.0f,-	1.0f, 1.0f,		1.0f, 1.0f,	0.0f,	 0.0f,-1.0f, 0.0f		} //35	RIGHT	BOT FAR
 			};										   
-#if 0
-			unsigned int indices[] = {
-				0,
-				1,
-				2,
-				3,
-				4,
-				5,
-				6,
-				7,
-				8,
-				9,
-				10,
-				11,
-				12,
-				13,
-				14,
-				15,
-				16,
-				17,
-				18,
-				19,
-				20,
-				21,
-				22,
-				23
-			};
 
-#endif // 0
+			unsigned int PainInTheInt_SkyIndices[] = {
+				// Near Face
+				0,  2,  5,
+				8,  1,  19,
 
-
-			/*
-			// Front Face (1-2-3-4)
-			{ -1.0f, 1.0f, -1.0f, 1, 1, 0, 0, 0 },
-			{1.0f, 1.0f, -1.0f, 0xffffafaf },
-			{ -1.0f, -1.0f, -1.0f, 0xffffafaf },
-			{1.0f, -1.0f, -1.0f, 0xffff0000 },
-
-			// Right Face (2-6-4-8)
-			{1.0f, 1.0f, -1.0f, 0xff00ff00 },
-			{1.0f, 1.0f, 1.0f, 0xffafffaf },
-			{1.0f, -1.0f, -1.0f, 0xffafffaf },
-			{1.0f, -1.0f, 1.0f, 0xff00ff00 },
-
-			// Top Face (5-6-1-2)
-			{ -1.0f, 1.0f, 1.0f, 0xff0000ff },
-			{1.0f, 1.0f, 1.0f, 0xffafafff },
-			{ -1.0f, 1.0f, -1.0f, 0xffafafff },
-			{1.0f, 1.0f, -1.0f, 0xff0000ff },
-
-			// Back Face (6-5-8-7)
-			{1.0f, 1.0f, 1.0f, 0xffffff00 },
-			{ -1.0f, 1.0f, 1.0f, 0xffffffaf },
-			{1.0f, -1.0f, 1.0f, 0xffffffaf },
-			{ -1.0f, -1.0f, 1.0f, 0xffffff00 },
-
-			// Left Face (5-1-7-3)
-			{ -1.0f, 1.0f, 1.0f, 0xffff00ff },
-			{ -1.0f, 1.0f, -1.0f, 0xffffafff },
-			{ -1.0f, -1.0f, 1.0f, 0xffffafff },
-			{ -1.0f, -1.0f, -1.0f, 0xffff00ff },
-
-			// Bottom Face (3-4-7-8)
-			{ -1.0f, -1.0f, -1.0f, 0xff00ffff },
-			{1.0f, -1.0f, -1.0f, 0xffafffff },
-			{ -1.0f, -1.0f, 1.0f, 0xffafffff },
-			{1.0f, -1.0f, 1.0f, 0xff00ffff }
-			*/
-#if 1
-			unsigned int indices[] = {
-				// Front Face
-				0,  1,  2,
-				0,  2,  3,
-
-				// Back Face
-				4,  5,  6,
-				4,  6,  7,
-
-				// Top Face
-				8,  9, 10,
-				8, 10, 11,
+				// Far Face
+				20,  13,  7,
+				10,  14,  32,
 
 				// Bottom Face
-				12, 13, 14,
-				12, 14, 15,
+				9,3,17,
+				21,11,31,
+
+				// Top Face
+				12,16,22,
+				26,4,25,
 
 				// Left Face
-				16, 17, 18,
-				16, 18, 19,
+				23,27,18,
+				24,33,30,
 
 				// Right Face
-				20, 21, 22,
-				20, 22, 23
-
+				15, 28, 6,
+				29, 34, 35
 			};
-
-#endif // 0
-
-			
 
 			// Set up the description of the static vertex buffer.
 			vertexBufferDescSky.Usage = D3D11_USAGE_DEFAULT;
@@ -987,7 +914,7 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			indexBufferDescSky.StructureByteStride = 0;
 
 			// Give the subresource structure a pointer to the index data.
-			indexDataSky.pSysMem = indices;
+			indexDataSky.pSysMem = PainInTheInt_SkyIndices;
 			indexDataSky.SysMemPitch = 0;
 			indexDataSky.SysMemSlicePitch = 0;
 
