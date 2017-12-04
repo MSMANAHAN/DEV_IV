@@ -232,8 +232,24 @@ bool ShaderInvoker::InitializeShader(ID3D11Device* device)
 	m_samplerDesc.BorderColor[3] = 0;
 	m_samplerDesc.MinLOD = 0;
 	m_samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
-
 	result = device->CreateSamplerState(&m_samplerDesc, &m_samplerState);
+
+
+	m_skySamplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	m_skySamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+	m_skySamplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+	m_skySamplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+	m_skySamplerDesc.MipLODBias = 0.0f;
+	m_skySamplerDesc.MaxAnisotropy = 1;
+	m_skySamplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+	m_skySamplerDesc.BorderColor[0] = 0;
+	m_skySamplerDesc.BorderColor[1] = 0;
+	m_skySamplerDesc.BorderColor[2] = 0;
+	m_skySamplerDesc.BorderColor[3] = 0;
+	m_skySamplerDesc.MinLOD = 0;
+	m_skySamplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+	result = device->CreateSamplerState(&m_skySamplerDesc, &m_skySamplerState);
+
 #endif // MESHLIGHTSH
 
 
@@ -440,10 +456,21 @@ void ShaderInvoker::RenderShader(ID3D11DeviceContext *deviceContext, int indexCo
 	// Set the vertex and pixel shaders that will be used to render this triangle.
 	deviceContext->VSSetShader(m_vertexMeshLightShader, NULL, 0);
 	if (UVScrolling)
+	{
 		deviceContext->PSSetShader(m_pixelUVScrollingMeshLightShader, NULL, 0);
-	else
-		deviceContext->PSSetShader(m_pixelMeshLightShader, NULL, 0);
 	deviceContext->PSSetSamplers(0, 1, &m_samplerState);
+	}
+	else if (skyBox)
+	{
+		deviceContext->PSSetShader(m_pixelSkyboxMeshLightShader, NULL, 0);
+		deviceContext->PSSetSamplers(0, 1, &m_skySamplerState);
+	}
+	else
+	{
+		deviceContext->PSSetShader(m_pixelMeshLightShader, NULL, 0);
+		deviceContext->PSSetSamplers(0, 1, &m_samplerState);
+	}
+
 #endif // MESHLIGHTSH
 
 	// Render the triangle.

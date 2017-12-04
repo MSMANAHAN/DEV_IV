@@ -25,6 +25,7 @@ struct PixelInputType
     float4 position : SV_POSITION;
     float3 tex : TEXCOORD0;
     float3 normals : NORMAL;
+    float3 skyPos : POSITION;
 };
 
 
@@ -35,6 +36,9 @@ PixelInputType MeshLightVertexShader(VertexInputType input)
 {
     PixelInputType output;
     
+    output.skyPos.x = input.position.x;
+    output.skyPos.y = input.position.y;
+    output.skyPos.z = input.position.z;
     // Change the position vector to be 4 units for proper matrix calculations.
     input.position.w = 1.0f;
         // Update the position of the vertices based on the data for this particular instance.

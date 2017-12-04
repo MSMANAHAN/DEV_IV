@@ -18,7 +18,8 @@ struct PixelInputType
 {
     float4 position : SV_POSITION;
     float3 tex : TEXCOORD0;
-    float4 normals : NORMAL;
+    float3 normals : NORMAL;
+    float3 skyPos : POSITION;
 };
 
 
@@ -31,8 +32,12 @@ float4 SkyBoxMeshLightPixelShader(PixelInputType input) : SV_TARGET
     float3 lightDir;
     float lightIntensity;
     float4 color;
+    //x,y,z position before view and projection mult is u,v,w
 
-
+    input.tex[0] = input.skyPos.x;
+    input.tex[1] = input.skyPos.y;
+    input.tex[2] = input.skyPos.z;
+    
     // Sample the pixel color from the texture using the sampler at this texture coordinate location.
     textureColor = shaderTexture.Sample(SampleType, (float2) input.tex);
 
@@ -45,7 +50,7 @@ float4 SkyBoxMeshLightPixelShader(PixelInputType input) : SV_TARGET
     color = saturate(diffuseColor * lightIntensity);
 
     // Multiply the texture pixel and the final diffuse color to get the final pixel color result.
-    color = color * textureColor;
+    color = textureColor;
 
     return color;
 }

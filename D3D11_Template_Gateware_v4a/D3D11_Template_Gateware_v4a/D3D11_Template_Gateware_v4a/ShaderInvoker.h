@@ -47,6 +47,7 @@ public:
 	void Shutdown();
 	bool Render(ID3D11DeviceContext*, int, int, int, XMMATRIX, XMMATRIX, XMMATRIX, XMFLOAT3, XMFLOAT4);
 	bool UVScrolling = false;
+	bool skyBox = false;
 	bool instanceRendering = false;
 
 private:
@@ -70,6 +71,8 @@ private:
 	ID3D11Buffer* m_matrixBuffer;
 	ID3D11SamplerState* m_samplerState;
 	D3D11_SAMPLER_DESC m_samplerDesc;
+	ID3D11SamplerState* m_skySamplerState;
+	D3D11_SAMPLER_DESC m_skySamplerDesc;
 	ID3D11Buffer* m_lightBuffer;
 
 };
