@@ -159,6 +159,8 @@ public:
 	float farPlane = 50;
 	float zoomFOV = 4;
 	bool UVScrolling = false;
+	unsigned int width;
+	unsigned int height;
 private:
 	int GetIndexCount();
 };
@@ -1061,12 +1063,19 @@ void LetsDrawSomeStuff::Render()
 			//myContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 #pragma endregion
-
+			
 			//Set up matrices
 			worldMatrix = DirectX::XMMatrixIdentity();
 			m_Camera->GetViewMatrix(viewMatrix);
-			projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(3.14f / zoomFOV, 1024 / 768, nearPlane, farPlane);
-			
+			if (height && width)
+			{
+				if (width >= height)
+				{
+					projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(3.14f / zoomFOV, width / height, nearPlane, farPlane);
+				}
+				else
+					projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(3.14f / zoomFOV, height / width, nearPlane, farPlane);
+			}
 			m_lightDir = XMFLOAT3(translation, 0, 0);
 			m_diffuseColor = XMFLOAT4(1, 1, 1, 1);
 
