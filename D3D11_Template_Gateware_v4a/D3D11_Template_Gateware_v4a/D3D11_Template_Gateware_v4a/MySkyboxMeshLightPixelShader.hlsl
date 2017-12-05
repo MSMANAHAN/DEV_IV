@@ -1,7 +1,7 @@
 /////////////
 // GLOBALS //
 /////////////
-Texture2D shaderTexture;
+TextureCube shaderTexture;
 SamplerState SampleType;
 
 cbuffer LightBuffer
@@ -39,7 +39,7 @@ float4 SkyBoxMeshLightPixelShader(PixelInputType input) : SV_TARGET
     input.tex[2] = input.skyPos.z;
     
     // Sample the pixel color from the texture using the sampler at this texture coordinate location.
-    textureColor = shaderTexture.Sample(SampleType, (float2) input.tex);
+    textureColor = shaderTexture.Sample(SampleType, (float3) input.tex);
 
         // Invert the light direction for calculations.
     lightDir = -lightDirection;
