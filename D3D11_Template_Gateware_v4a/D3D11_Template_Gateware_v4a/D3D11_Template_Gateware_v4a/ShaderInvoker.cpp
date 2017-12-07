@@ -167,12 +167,17 @@ bool ShaderInvoker::InitializeShader(ID3D11Device* device)
 
 #if MESHLIGHTSH
 	// Create the vertex shader from the buffer.
+	result = device->CreateVertexShader(MySinMeshLightVertexShader, ARRAYSIZE(MySinMeshLightVertexShader), NULL, &m_vertexSinMeshLightShader);
+	if (FAILED(result))
+	{
+		return false;
+	}
+	// Create the vertex shader from the buffer.
 	result = device->CreateVertexShader(MyMeshLightVertexShader, ARRAYSIZE(MyMeshLightVertexShader), NULL, &m_vertexMeshLightShader);
 	if (FAILED(result))
 	{
 		return false;
 	}
-
 
 	// Create the pixel shader from the buffer.
 	result = device->CreatePixelShader(MySkyboxMeshLightPixelShader, ARRAYSIZE(MySkyboxMeshLightPixelShader), NULL, &m_pixelSkyboxMeshLightShader);
@@ -455,7 +460,10 @@ void ShaderInvoker::RenderShader(ID3D11DeviceContext *deviceContext, int indexCo
 
 #if MESHLIGHTSH
 	// Set the vertex and pixel shaders that will be used to render this triangle.
-	deviceContext->VSSetShader(m_vertexMeshLightShader, NULL, 0);
+	if (sinRendering)	
+		deviceContext->VSSetShader(m_vertexSinMeshLightShader, NULL, 0);	
+	else
+		deviceContext->VSSetShader(m_vertexMeshLightShader, NULL, 0);
 	if (UVScrolling)
 	{
 		deviceContext->PSSetShader(m_pixelUVScrollingMeshLightShader, NULL, 0);

@@ -32,7 +32,7 @@ struct PixelInputType
 ////////////////////////////////////////////////////////////////////////////////
 // New Vertex Shader For Textures
 ////////////////////////////////////////////////////////////////////////////////
-PixelInputType MeshLightVertexShader(VertexInputType input)
+PixelInputType SinMeshLightVertexShader(VertexInputType input)
 {
     PixelInputType output;
     
@@ -42,7 +42,7 @@ PixelInputType MeshLightVertexShader(VertexInputType input)
     input.position.x += input.instancePosition.x;
     input.position.y += input.instancePosition.y;
     input.position.z += input.instancePosition.z;
-
+    input.position.y = sin(input.position.y);
     // Calculate the position of the vertex against the world, view, and projection matrices.
     output.position = mul(input.position, worldMatrix);
     output.skyPos.x = output.position.x;
@@ -63,3 +63,5 @@ PixelInputType MeshLightVertexShader(VertexInputType input)
     
     return output;
 }
+
+//MySinMeshLightVertexShader

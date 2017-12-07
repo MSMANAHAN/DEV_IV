@@ -14,6 +14,7 @@
 #include "MyMeshLightPixelShader.csh"
 #include "MyUVScrollingMeshLightPixelShader.csh"
 #include "MySkyboxMeshLightPixelShader.csh"
+#include "MySinMeshLightVertexShader.csh"
 
 using namespace std;
 using namespace DirectX;
@@ -49,6 +50,7 @@ public:
 	bool UVScrolling = false;
 	bool skyBox = false;
 	bool instanceRendering = false;
+	bool sinRendering = false;
 
 private:
 	bool InitializeShader(ID3D11Device*);
@@ -63,6 +65,8 @@ private:
 	ID3D11PixelShader * m_pixelTexShader;
 	ID3D11VertexShader* m_vertexMeshLightShader;
 	ID3D11PixelShader * m_pixelMeshLightShader;
+	ID3D11VertexShader* m_vertexSinMeshLightShader;
+
 	ID3D11PixelShader * m_pixelUVScrollingMeshLightShader;
 	ID3D11PixelShader * m_pixelSkyboxMeshLightShader;
 

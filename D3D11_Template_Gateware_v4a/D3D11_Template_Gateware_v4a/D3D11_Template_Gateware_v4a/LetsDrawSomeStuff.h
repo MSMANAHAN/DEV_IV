@@ -1233,6 +1233,7 @@ void LetsDrawSomeStuff::Render()
 			#pragma endregion
 
 			#pragma region Mesh5
+						m_ShaderInv->sinRendering = true;
 						myContext->PSSetShaderResources(0, 1, &m_shaderResourceView5);
 						// Set the vertex buffer to active in the input assembler so it can be rendered.
 						myContext->IASetVertexBuffers(0, 1, &m_vertexBuffer5, &stride, &offset);
@@ -1243,6 +1244,7 @@ void LetsDrawSomeStuff::Render()
 						// Set the index buffer to active in the input assembler so it can be rendered.
 						worldMatrix = XMMatrixMultiply(XMMatrixScaling(3, 3, 3), XMMatrixTranslation(0, 8, 140));
 						m_ShaderInv->Render(myContext, m_indexCount5, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+						m_ShaderInv->sinRendering = false;
 
 			#pragma endregion
 
