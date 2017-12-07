@@ -10,6 +10,7 @@
 #include <DirectXMath.h>
 #include <dxgiformat.h> 
 #include <iostream>
+#include <thread>
 #include "DirectXTex-master\DirectXTex\DirectXTex.h"
 #include "DirectXTex-master\DDSTextureLoader\DDSTextureLoader.h"
 //#include <d3dx11tex.h>
@@ -23,10 +24,12 @@
 #include "Grass_03.h"
 #include "Rope Bridge.h"
 #include "chevalier.h"
+
 using namespace DirectX;
 #define COLOR false
 #define TEXTURE false
 #define MESHLIGHT true
+#define TEXTURECOUNT 6
 
 // Simple Container class to make life easier/cleaner
 class LetsDrawSomeStuff
@@ -42,6 +45,8 @@ class LetsDrawSomeStuff
 	XMFLOAT3 m_lightDir;
 	ID3D11Buffer* m_instanceBuffer;
 	int m_instanceCount;
+	std::vector<std::thread> ThreadVector;
+
 
 	// TODO: Add your own D3D11 variables here (be sure to "Release()" them when done!)
 #pragma region Mesh 1
@@ -163,6 +168,17 @@ public:
 	unsigned int height;
 private:
 	int GetIndexCount();
+	struct TextureThreadType
+	{
+		int id;
+		ID3D11Device* d3dDevice;
+		const wchar_t* fileName;
+		ID3D11Resource** texture;
+		ID3D11ShaderResourceView** textureView;
+	};
+	void JoinableThreadEntrypoint(TextureThreadType *threadData);
+	void ProcessTextures(int id);
+	TextureThreadType arrayOfTextures[TEXTURECOUNT];
 };
 
 struct Vertex
@@ -199,6 +215,7 @@ struct InstanceType
 {
 	XMFLOAT3 position;
 };
+
 
 // Init
 LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
@@ -478,14 +495,76 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 
 #if MESHLIGHT
 
+#pragma region arrayOfTextures Initialization
+
+			arrayOfTextures[0] =
+			{
+				0,
+				myDevice,
+				L"wall.dds",
+				&m_texture1,
+				&m_shaderResourceView1
+			};
+			arrayOfTextures[1] =
+			{
+				1,
+				myDevice,
+				L"Pyramid.dds",
+				&m_texture2,
+				&m_shaderResourceView2
+			};
+			arrayOfTextures[2] =
+			{
+				2,
+				myDevice,
+				L"grass_diff.dds",
+				&m_texture3,
+				&m_shaderResourceView3
+			};
+			arrayOfTextures[3] =
+			{
+				3,
+				myDevice,
+				L"Bridge_Plank.dds",
+				&m_texture5,
+				&m_shaderResourceView5
+			};
+			arrayOfTextures[4] =
+			{
+				4,
+				myDevice,
+				L"chevalier.dds",
+				&m_texture6,
+				&m_shaderResourceView6
+			};
+			arrayOfTextures[5] =
+			{
+				5,
+				myDevice,
+				L"SunsetSkybox.dds",
+				&m_textureSky,
+				&m_shaderResourceViewSky
+			};
+#pragma endregion
+
+		for (size_t i = 0; i < TEXTURECOUNT; i++)
+		{
+			ThreadVector.push_back(std::thread(&LetsDrawSomeStuff::JoinableThreadEntrypoint, this, &arrayOfTextures[i]));
+		}
+
+		for (auto& thread : ThreadVector)
+		{
+			thread.join();
+		}
+
 #pragma region Mesh1
 
-			result = CreateDDSTextureFromFile(myDevice, L"wall.dds", &m_texture1, &m_shaderResourceView1, DXGI_ALPHA_MODE_UNSPECIFIED);
+			//result = CreateDDSTextureFromFile(myDevice, L"wall.dds", &m_texture1, &m_shaderResourceView1, DXGI_ALPHA_MODE_UNSPECIFIED);
 
-			if (FAILED(result))
-			{
-				cout << "Texture not work";
-			}
+			//if (FAILED(result))
+			//{
+			//	cout << "Texture not work";
+			//}
 			// Set the number of vertices in the vertex array.
 			m_vertexCount1 = 776;
 
@@ -526,12 +605,12 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 #pragma endregion
 
 #pragma region Mesh2
-			result = CreateDDSTextureFromFile(myDevice, L"Pyramid.dds", &m_texture2, &m_shaderResourceView2, DXGI_ALPHA_MODE_UNSPECIFIED);
+			//result = CreateDDSTextureFromFile(myDevice, L"Pyramid.dds", &m_texture2, &m_shaderResourceView2, DXGI_ALPHA_MODE_UNSPECIFIED);
 
-			if (FAILED(result))
-			{
-				cout << "Texture not work";
-			}
+			//if (FAILED(result))
+			//{
+			//	cout << "Texture not work";
+			//}
 			// Set the number of vertices in the vertex array.
 			m_vertexCount2 = 768;
 
@@ -575,12 +654,12 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			D3D11_BUFFER_DESC vertexBufferDesc, instanceBufferDesc;
 			D3D11_SUBRESOURCE_DATA vertexData, instanceData;
 			// Set the number of instances in the array.
-			result = CreateDDSTextureFromFile(myDevice, L"grass_diff.dds", &m_texture3, &m_shaderResourceView3, DXGI_ALPHA_MODE_UNSPECIFIED);
+			//result = CreateDDSTextureFromFile(myDevice, L"grass_diff.dds", &m_texture3, &m_shaderResourceView3, DXGI_ALPHA_MODE_UNSPECIFIED);
 
-			if (FAILED(result))
-			{				
-				std::cout << "Texture not work";
-			}
+			//if (FAILED(result))
+			//{				
+			//	std::cout << "Texture not work";
+			//}
 			// Set the number of vertices in the vertex array.
 			m_vertexCount3 = 8989;
 
@@ -725,12 +804,12 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 #pragma endregion
 
 #pragma region Mesh5
-			result = CreateDDSTextureFromFile(myDevice, L"Bridge_Plank.dds", &m_texture5, &m_shaderResourceView5, DXGI_ALPHA_MODE_UNSPECIFIED);
+			//result = CreateDDSTextureFromFile(myDevice, L"Bridge_Plank.dds", &m_texture5, &m_shaderResourceView5, DXGI_ALPHA_MODE_UNSPECIFIED);
 
-			if (FAILED(result))
-			{
-				cout << "Texture not work";
-			}
+			//if (FAILED(result))
+			//{
+			//	cout << "Texture not work";
+			//}
 			// Set the number of vertices in the vertex array.
 			m_vertexCount5 = 3307;
 
@@ -769,12 +848,12 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 #pragma endregion
 
 #pragma region Mesh6
-			result = CreateDDSTextureFromFile(myDevice, L"chevalier.dds", &m_texture6, &m_shaderResourceView6, DXGI_ALPHA_MODE_UNSPECIFIED);
+			//result = CreateDDSTextureFromFile(myDevice, L"chevalier.dds", &m_texture6, &m_shaderResourceView6, DXGI_ALPHA_MODE_UNSPECIFIED);
 
-			if (FAILED(result))
-			{
-				cout << "Texture not work";
-			}
+			//if (FAILED(result))
+			//{
+			//	cout << "Texture not work";
+			//}
 			// Set the number of vertices in the vertex array.
 			m_vertexCount6 = 1211;
 
@@ -813,12 +892,12 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 #pragma endregion
 
 #pragma region SkyBox
-			result = CreateDDSTextureFromFile(myDevice, L"SunsetSkybox.dds", &m_textureSky, &m_shaderResourceViewSky, DXGI_ALPHA_MODE_UNSPECIFIED);
+			//result = CreateDDSTextureFromFile(myDevice, L"SunsetSkybox.dds", &m_textureSky, &m_shaderResourceViewSky, DXGI_ALPHA_MODE_UNSPECIFIED);
 
-			if (FAILED(result))
-			{
-				cout << "Texture not work";
-			}
+			//if (FAILED(result))
+			//{
+			//	cout << "Texture not work";
+			//}
 
 			// Set the number of vertices in the vertex array.
 			m_vertexCountSky = 36;
@@ -935,9 +1014,6 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 
 			m_ShaderInv = new ShaderInvoker;
 			m_ShaderInv->Initialize(myDevice);
-
-			m_lightDir = XMFLOAT3(1, 0, 0);
-			m_diffuseColor = XMFLOAT4(1, 0, 0, 1);
 
 			// Release the instance array now that the instance buffer has been created and loaded.
 			delete[] instances;
@@ -1075,9 +1151,12 @@ void LetsDrawSomeStuff::Render()
 				}
 				else
 					projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(3.14f / zoomFOV, height / width, nearPlane, farPlane);
+
+
 			}
+
 			m_lightDir = XMFLOAT3(translation, 0, 0);
-			m_diffuseColor = XMFLOAT4(1, 1, 1, 1);
+			m_diffuseColor = XMFLOAT4(0, 0, .5, 0);
 
 			#pragma region Mesh1
 						myContext->PSSetShaderResources(0, 1, &m_shaderResourceView1);
@@ -1097,17 +1176,29 @@ void LetsDrawSomeStuff::Render()
 			#pragma endregion
 
 			#pragma region Mesh2
-						m_ShaderInv->UVScrolling = true;
-						myContext->PSSetShaderResources(0, 1, &m_shaderResourceView2);
-						// Set the vertex buffer to active in the input assembler so it can be rendered.
-						myContext->IASetVertexBuffers(0, 1, &m_vertexBuffer2, &stride, &offset);
+						//m_ShaderInv->UVScrolling = true;
+						//myContext->PSSetShaderResources(0, 1, &m_shaderResourceView2);
+						//// Set the vertex buffer to active in the input assembler so it can be rendered.
+						//myContext->IASetVertexBuffers(0, 1, &m_vertexBuffer2, &stride, &offset);
 
-						// Set the index buffer to active in the input assembler so it can be rendered.
-						myContext->IASetIndexBuffer(m_indexBuffer2, DXGI_FORMAT_R32_UINT, 0);
+						//// Set the index buffer to active in the input assembler so it can be rendered.
+						//myContext->IASetIndexBuffer(m_indexBuffer2, DXGI_FORMAT_R32_UINT, 0);
 
-						// Set the index buffer to active in the input assembler so it can be rendered.
-						worldMatrix = XMMatrixMultiply(XMMatrixScaling(45, 45, 45), XMMatrixTranslation(140 + translation, 4, 60));
-						m_ShaderInv->Render(myContext, m_indexCount2, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+						//// Set the index buffer to active in the input assembler so it can be rendered.
+						//worldMatrix = XMMatrixMultiply(XMMatrixScaling(5, 5, 5), XMMatrixTranslation(m_lightDir.x, m_lightDir.y, m_lightDir.z));
+						//m_ShaderInv->Render(myContext, m_indexCount2, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+
+						//m_ShaderInv->UVScrolling = true;
+						//myContext->PSSetShaderResources(0, 1, &m_shaderResourceView2);
+						//// Set the vertex buffer to active in the input assembler so it can be rendered.
+						//myContext->IASetVertexBuffers(0, 1, &m_vertexBuffer2, &stride, &offset);
+
+						//// Set the index buffer to active in the input assembler so it can be rendered.
+						//myContext->IASetIndexBuffer(m_indexBuffer2, DXGI_FORMAT_R32_UINT, 0);
+
+						//// Set the index buffer to active in the input assembler so it can be rendered.
+						//worldMatrix = XMMatrixMultiply(XMMatrixScaling(45, 45, 45), XMMatrixTranslation(140 + translation, 25, 60));
+						//m_ShaderInv->Render(myContext, m_indexCount2, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
 
 			#pragma endregion
 
@@ -1137,7 +1228,7 @@ void LetsDrawSomeStuff::Render()
 						// Set the index buffer to active in the input assembler so it can be rendered.
 						myContext->IASetIndexBuffer(m_indexBuffer3, DXGI_FORMAT_R32_UINT, 0);
 						worldMatrix = XMMatrixMultiply(XMMatrixTranslation(0, -0.0f, 0), XMMatrixScaling(1.0f, 1.0f, 1.0f));
-						m_ShaderInv->Render(myContext, m_indexCount3, 0, m_instanceCount, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+						m_ShaderInv->Render(myContext, m_indexCount3, 0, 1, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
 						m_ShaderInv->instanceRendering = false;
 			#pragma endregion
 
@@ -1181,7 +1272,7 @@ void LetsDrawSomeStuff::Render()
 						myContext->IASetIndexBuffer(m_indexBufferSky, DXGI_FORMAT_R32_UINT, 0);
 
 						// Set the index buffer to active in the input assembler so it can be rendered.
-						worldMatrix = XMMatrixMultiply(XMMatrixScaling(800, 800, 800), XMMatrixTranslation(m_Camera->m_positionX + 2000, m_Camera->m_positionY + 9, m_Camera->m_positionZ - 160));
+						worldMatrix = XMMatrixMultiply(XMMatrixScaling(800.0f, 800.0f, 800.0f), XMMatrixTranslation((float)(m_Camera->m_positionX + 2000), (float)(m_Camera->m_positionY + 9), (float)(m_Camera->m_positionZ - 760)));
 						m_ShaderInv->Render(myContext, m_indexCountSky, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
 						m_ShaderInv->skyBox = false;
 
@@ -1203,8 +1294,6 @@ void LetsDrawSomeStuff::Render()
 			//			m_ShaderInv->Render(myContext, m_indexCount4, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
 			//#pragma endregion
 
-
-
 			// Present Backbuffer using Swapchain object
 			// Framerate is currently unlocked, we suggest "MSI Afterburner" to track your current FPS and memory usage.
 			mySwapChain->Present(0, 0);
@@ -1213,6 +1302,17 @@ void LetsDrawSomeStuff::Render()
 			myRenderTargetView->Release();
 		}
 	}
+}
+
+ void LetsDrawSomeStuff::ProcessTextures(int id)
+ {
+	 CreateDDSTextureFromFile(arrayOfTextures[id].d3dDevice, arrayOfTextures[id].fileName, arrayOfTextures[id].texture, arrayOfTextures[id].textureView, DXGI_ALPHA_MODE_UNSPECIFIED);
+ }
+
+ void LetsDrawSomeStuff::JoinableThreadEntrypoint(TextureThreadType * threadData)
+{
+	std::thread textureCreator(&LetsDrawSomeStuff::ProcessTextures, this, threadData->id);
+	textureCreator.join();
 }
 
 int LetsDrawSomeStuff::GetIndexCount()

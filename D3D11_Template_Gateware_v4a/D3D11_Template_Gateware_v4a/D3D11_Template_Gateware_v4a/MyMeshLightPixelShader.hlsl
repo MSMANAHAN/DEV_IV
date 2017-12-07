@@ -19,6 +19,7 @@ struct PixelInputType
     float4 position : SV_POSITION;
     float3 tex : TEXCOORD0;
     float4 normals : NORMAL;
+    float3 skyPos : POSITION;
 };
 
 
@@ -28,24 +29,62 @@ struct PixelInputType
 float4 MeshLightPixelShader(PixelInputType input) : SV_TARGET
 {
     float4 textureColor;
-    float3 lightDir;
+    float lightDir;
     float lightIntensity;
     float4 color;
-
+    float4 color2;
+    float4 ambient;
+    float4 redTint;
+    float3 surfacePos;
+    float lightposSurf;
+    float3 lightToPixelVec;
+    float radius = 10;
+    
+    ambient[0] = .2;
+    ambient[1] = .2;
+    ambient[2] = .2;
+    ambient[3] = 0;
 
     // Sample the pixel color from the texture using the sampler at this texture coordinate location.
     textureColor = shaderTexture.Sample(SampleType, (float2) input.tex);
 
-        // Invert the light direction for calculations.
+    redTint[0] = 1;
+    redTint[1] = 0;
+    redTint[2] = 0;
+    redTint[3] = 0;
+
+    surfacePos = input.skyPos;
+    //attentuation   
+    float xTwoMinusxOne = (surfacePos[0] - lightDirection[0]);
+    float yTwoMinusyOne = (surfacePos[1] - lightDirection[1]);
+    float zTwoMinuszOne = (surfacePos[2] - lightDirection[2]);
+    xTwoMinusxOne *= xTwoMinusxOne;
+    yTwoMinusyOne *= yTwoMinusyOne;
+    zTwoMinuszOne *= zTwoMinuszOne;
+    float dist = sqrt(xTwoMinusxOne + yTwoMinusyOne + zTwoMinuszOne);
+
+    float4 attenuation[3]; // = 1 - saturate(dist / 1.00);
+    
+    attenuation[0] = ambient * textureColor;
+
+    //Direction Light Calculations
     lightDir = -lightDirection;
-
-    // Calculate the amount of light on this pixel.
     lightIntensity = saturate(dot((float3) input.normals, lightDir));
-    // Determine the final amount of diffuse color based on the diffuse color combined with the light intensity.
-    color = saturate(diffuseColor * lightIntensity);
+    attenuation[1] = saturate(diffuseColor * lightIntensity);
+    attenuation[1] *= textureColor;
 
-    // Multiply the texture pixel and the final diffuse color to get the final pixel color result.
-    color = color * textureColor;
+    //Point Light Calculations with red tint
+    lightposSurf = (dist)/radius;
+    lightDir = 1 - saturate(lightposSurf);
+    lightIntensity = saturate(dot((float3) input.normals, lightDir));
+    attenuation[2] = saturate((redTint) * lightIntensity);
+    attenuation[2] *= textureColor;
 
+    //color /= attenuation;
+    // ambient light + point light + directional light * the color of the texture
+    color =
+    attenuation[0] +
+    attenuation[1] * dist +
+    attenuation[2] * (dist * dist);
     return color;
 }

@@ -36,9 +36,6 @@ PixelInputType MeshLightVertexShader(VertexInputType input)
 {
     PixelInputType output;
     
-    output.skyPos.x = input.position.x;
-    output.skyPos.y = input.position.y;
-    output.skyPos.z = input.position.z;
     // Change the position vector to be 4 units for proper matrix calculations.
     input.position.w = 1.0f;
         // Update the position of the vertices based on the data for this particular instance.
@@ -47,6 +44,9 @@ PixelInputType MeshLightVertexShader(VertexInputType input)
     input.position.z += input.instancePosition.z;
     // Calculate the position of the vertex against the world, view, and projection matrices.
     output.position = mul(input.position, worldMatrix);
+    output.skyPos.x = output.position.x;
+    output.skyPos.y = output.position.y;
+    output.skyPos.z = output.position.z;
     output.position = mul(output.position, viewMatrix);
     output.position = mul(output.position, projectionMatrix);
 

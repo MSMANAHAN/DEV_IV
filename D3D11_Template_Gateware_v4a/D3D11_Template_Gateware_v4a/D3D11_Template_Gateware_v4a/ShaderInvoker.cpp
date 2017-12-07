@@ -406,6 +406,7 @@ bool ShaderInvoker::SetShaderParameters(ID3D11DeviceContext* deviceContext, XMMA
 
 	// Set the constant buffer in the vertex shader with the updated values.
 	deviceContext->VSSetConstantBuffers(bufferNumber, 1, &m_matrixBuffer);
+	//deviceContext->PSSetConstantBuffers(bufferNumber, 1, &m_matrixBuffer);
 
 	// Lock the light constant buffer so it can be written to.
 	result = deviceContext->Map(m_lightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
