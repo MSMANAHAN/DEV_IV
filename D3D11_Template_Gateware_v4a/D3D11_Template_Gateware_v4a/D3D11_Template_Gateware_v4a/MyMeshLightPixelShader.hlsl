@@ -38,8 +38,10 @@ float4 MeshLightPixelShader(PixelInputType input) : SV_TARGET
     float3 surfacePos;
     float lightposSurf;
     float3 lightToPixelVec;
-    float radius = 10;
-    
+    float radius = 20;
+    float4 greenTint;
+    float3 lightDirect;
+    float4 lightPosSurface;
     ambient[0] = .2;
     ambient[1] = .2;
     ambient[2] = .2;
@@ -53,6 +55,11 @@ float4 MeshLightPixelShader(PixelInputType input) : SV_TARGET
     redTint[2] = 0;
     redTint[3] = 0;
 
+    greenTint[0] = 0;
+    greenTint[1] = 1;
+    greenTint[2] = 0;
+    greenTint[3] = 0;
+
     surfacePos = input.skyPos;
     //attentuation   
     float xTwoMinusxOne = (surfacePos[0] - lightDirection[0]);
@@ -63,28 +70,35 @@ float4 MeshLightPixelShader(PixelInputType input) : SV_TARGET
     zTwoMinuszOne *= zTwoMinuszOne;
     float dist = sqrt(xTwoMinusxOne + yTwoMinusyOne + zTwoMinuszOne);
 
-    float4 attenuation[3]; // = 1 - saturate(dist / 1.00);
+    float4 attenuation[4]; // = 1 - saturate(dist / 1.00);
     
     attenuation[0] = ambient * textureColor;
 
+    lightDirect = surfacePos - lightDirection;
+    lightDirect = saturate(lightDirect);
     //Direction Light Calculations
-    lightDir = -lightDirection;
-    lightIntensity = saturate(dot((float3) input.normals, lightDir));
+    //lightDir = -lightDirection;
+    lightIntensity = saturate(dot(lightDirect.xyz, input.normals.xyz));
     attenuation[1] = saturate(diffuseColor * lightIntensity);
     attenuation[1] *= textureColor;
 
-    //Point Light Calculations with red tint
-    lightposSurf = (dist)/radius;
+    //Spot Light Calculations with red tint
+    lightposSurf = (dist) / (radius - 10);
     lightDir = 1 - saturate(lightposSurf);
-    lightIntensity = saturate(dot((float3) input.normals, lightDir));
+    lightIntensity = saturate(dot(input.normals.xyz, lightDir));
     attenuation[2] = saturate((redTint) * lightIntensity);
     attenuation[2] *= textureColor;
 
-    //color /= attenuation;
-    // ambient light + point light + directional light * the color of the texture
+    //Point Light
+    float fRangeAtt = 1 - saturate(dist/radius);
+    //lightIntensity = saturate(dot(lightDirect.xyz, input.normals.xyz));
+    attenuation[3] = saturate((greenTint) * fRangeAtt);
+    attenuation[3] *= textureColor;
+
     color =
     attenuation[0] +
     attenuation[1] * dist +
-    attenuation[2] * (dist * dist);
+    attenuation[2] * (dist * dist)+
+    attenuation[3] * (dist);
     return color;
 }
