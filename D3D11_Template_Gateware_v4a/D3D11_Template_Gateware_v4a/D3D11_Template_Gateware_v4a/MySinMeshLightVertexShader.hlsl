@@ -20,6 +20,14 @@ struct VertexInputType
     float3 instancePosition : TEXCOORD1;
 };
 
+struct GeometryInputType
+{
+    float4 position : SV_POSITION;
+    float3 tex : TEXCOORD0;
+    float3 normals : NORMAL;
+    float3 skyPos : POSITION;
+};
+
 struct PixelInputType
 {
     float4 position : SV_POSITION;
@@ -34,7 +42,7 @@ struct PixelInputType
 ////////////////////////////////////////////////////////////////////////////////
 PixelInputType SinMeshLightVertexShader(VertexInputType input)
 {
-    PixelInputType output;
+    GeometryInputType output;
     
     // Change the position vector to be 4 units for proper matrix calculations.
     input.position.w = 1.0f;
@@ -42,7 +50,7 @@ PixelInputType SinMeshLightVertexShader(VertexInputType input)
     input.position.x += input.instancePosition.x;
     input.position.y += input.instancePosition.y;
     input.position.z += input.instancePosition.z;
-    input.position.y = sin(input.position.y);
+    //input.position.y = sin(-input.position.y);
     // Calculate the position of the vertex against the world, view, and projection matrices.
     output.position = mul(input.position, worldMatrix);
     output.skyPos.x = output.position.x;

@@ -15,6 +15,7 @@
 #include "MyUVScrollingMeshLightPixelShader.csh"
 #include "MySkyboxMeshLightPixelShader.csh"
 #include "MySinMeshLightVertexShader.csh"
+#include "MyMeshLightGeometryShader.csh"
 
 using namespace std;
 using namespace DirectX;
@@ -22,6 +23,7 @@ using namespace DirectX;
 #define TEXTURESH false
 #define COLORSH false
 #define MESHLIGHTSH true
+
 class ShaderInvoker
 {
 private:
@@ -60,24 +62,24 @@ private:
 	void RenderShader(ID3D11DeviceContext*, int, int, int);
 
 private:
-	ID3D11VertexShader* m_vertexShader;
-	ID3D11VertexShader* m_vertexTexShader;
-	ID3D11PixelShader * m_pixelTexShader;
-	ID3D11VertexShader* m_vertexMeshLightShader;
-	ID3D11PixelShader * m_pixelMeshLightShader;
-	ID3D11VertexShader* m_vertexSinMeshLightShader;
+	ID3D11VertexShader*		m_vertexShader;
+	ID3D11VertexShader*		m_vertexTexShader;
+	ID3D11VertexShader*		m_vertexMeshLightShader;
+	ID3D11VertexShader*		m_vertexSinMeshLightShader;
+	
+	ID3D11GeometryShader*	m_geometryMeshLightShader;
 
-	ID3D11PixelShader * m_pixelUVScrollingMeshLightShader;
-	ID3D11PixelShader * m_pixelSkyboxMeshLightShader;
+	ID3D11PixelShader*		m_pixelShader;
+	ID3D11PixelShader *		m_pixelTexShader;
+	ID3D11PixelShader *		m_pixelMeshLightShader;
+	ID3D11PixelShader *		m_pixelUVScrollingMeshLightShader;
+	ID3D11PixelShader *		m_pixelSkyboxMeshLightShader;
 
-	ID3D11PixelShader* m_pixelShader;
-	ID3D11InputLayout* m_layout;
-	ID3D11Buffer* m_matrixBuffer;
-	ID3D11SamplerState* m_samplerState;
-	D3D11_SAMPLER_DESC m_samplerDesc;
-	ID3D11SamplerState* m_skySamplerState;
-	D3D11_SAMPLER_DESC m_skySamplerDesc;
-	ID3D11Buffer* m_lightBuffer;
-
+	D3D11_SAMPLER_DESC		m_samplerDesc;
+	D3D11_SAMPLER_DESC		m_skySamplerDesc;
+	ID3D11InputLayout*		m_layout;
+	ID3D11SamplerState*		m_samplerState;
+	ID3D11SamplerState*		m_skySamplerState;
+	ID3D11Buffer*			m_matrixBuffer;
+	ID3D11Buffer*			m_lightBuffer;
 };
-

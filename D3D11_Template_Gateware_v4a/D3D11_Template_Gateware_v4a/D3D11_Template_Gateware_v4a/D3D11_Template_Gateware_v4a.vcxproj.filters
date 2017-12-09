@@ -60,6 +60,12 @@
     <ClInclude Include="chevalier.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Knight2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="knight3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -101,6 +107,9 @@
       <Filter>Header Files</Filter>
     </FxCompile>
     <FxCompile Include="MySinMeshLightVertexShader.hlsl">
+      <Filter>Header Files</Filter>
+    </FxCompile>
+    <FxCompile Include="MyMeshLightGeometryShader.hlsl">
       <Filter>Header Files</Filter>
     </FxCompile>
   </ItemGroup>

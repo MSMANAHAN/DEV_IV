@@ -58,7 +58,6 @@ bool ShaderInvoker::Render(ID3D11DeviceContext *deviceContext, int indexCount, i
 bool ShaderInvoker::InitializeShader(ID3D11Device* device)
 {
 	HRESULT result;
-	ID3D10Blob* errorMessage;
 	//ID3D10Blob* vertexShaderBuffer;
 	//ID3D10Blob* pixelShaderBuffer;
 	unsigned int numElements;
@@ -166,6 +165,7 @@ bool ShaderInvoker::InitializeShader(ID3D11Device* device)
 #endif // TEXTURESH
 
 #if MESHLIGHTSH
+	
 	// Create the vertex shader from the buffer.
 	result = device->CreateVertexShader(MySinMeshLightVertexShader, ARRAYSIZE(MySinMeshLightVertexShader), NULL, &m_vertexSinMeshLightShader);
 	if (FAILED(result))
@@ -179,6 +179,14 @@ bool ShaderInvoker::InitializeShader(ID3D11Device* device)
 		return false;
 	}
 
+	//Create the Geometry Shader
+	result = device->CreateGeometryShader(MyMeshLightGeometryShader, ARRAYSIZE(MyMeshLightGeometryShader), NULL, &m_geometryMeshLightShader);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
+
 	// Create the pixel shader from the buffer.
 	result = device->CreatePixelShader(MySkyboxMeshLightPixelShader, ARRAYSIZE(MySkyboxMeshLightPixelShader), NULL, &m_pixelSkyboxMeshLightShader);
 	if (FAILED(result))
@@ -186,21 +194,19 @@ bool ShaderInvoker::InitializeShader(ID3D11Device* device)
 		return false;
 	}
 
+	// Create the pixel shader from the buffer.
+	result = device->CreatePixelShader(MyUVScrollingMeshLightPixelShader, ARRAYSIZE(MyUVScrollingMeshLightPixelShader), NULL, &m_pixelUVScrollingMeshLightShader);
+	if (FAILED(result))
+	{
+		return false;
+	}
 
-		// Create the pixel shader from the buffer.
-		result = device->CreatePixelShader(MyUVScrollingMeshLightPixelShader, ARRAYSIZE(MyUVScrollingMeshLightPixelShader), NULL, &m_pixelUVScrollingMeshLightShader);
-		if (FAILED(result))
-		{
-			return false;
-		}
-
-
-		// Create the pixel shader from the buffer.
-		result = device->CreatePixelShader(MyMeshLightPixelShader, ARRAYSIZE(MyMeshLightPixelShader), NULL, &m_pixelMeshLightShader);
-		if (FAILED(result))
-		{
-			return false;
-		}
+	// Create the pixel shader from the buffer.
+	result = device->CreatePixelShader(MyMeshLightPixelShader, ARRAYSIZE(MyMeshLightPixelShader), NULL, &m_pixelMeshLightShader);
+	if (FAILED(result))
+	{
+		return false;
+	}
 
 	//Input Layout Setup
 	//Now setup the layout of the data that goes into the shader.
@@ -223,7 +229,7 @@ bool ShaderInvoker::InitializeShader(ID3D11Device* device)
 	{
 		return false;
 	}
-
+	#pragma region Sampler States
 	m_samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 	m_samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
 	m_samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
@@ -254,6 +260,9 @@ bool ShaderInvoker::InitializeShader(ID3D11Device* device)
 	m_skySamplerDesc.MinLOD = 0;
 	m_skySamplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
 	result = device->CreateSamplerState(&m_skySamplerDesc, &m_skySamplerState);
+
+#pragma endregion
+
 
 #endif // MESHLIGHTSH
 
@@ -411,6 +420,7 @@ bool ShaderInvoker::SetShaderParameters(ID3D11DeviceContext* deviceContext, XMMA
 
 	// Set the constant buffer in the vertex shader with the updated values.
 	deviceContext->VSSetConstantBuffers(bufferNumber, 1, &m_matrixBuffer);
+	deviceContext->GSSetConstantBuffers(bufferNumber, 1, &m_matrixBuffer);
 	//deviceContext->PSSetConstantBuffers(bufferNumber, 1, &m_matrixBuffer);
 
 	// Lock the light constant buffer so it can be written to.
@@ -459,15 +469,18 @@ void ShaderInvoker::RenderShader(ID3D11DeviceContext *deviceContext, int indexCo
 #endif // TEXTURESH
 
 #if MESHLIGHTSH
-	// Set the vertex and pixel shaders that will be used to render this triangle.
+	// Set the vertex, geometry, and pixel shaders that will be used to render this triangle.
 	if (sinRendering)	
 		deviceContext->VSSetShader(m_vertexSinMeshLightShader, NULL, 0);	
 	else
 		deviceContext->VSSetShader(m_vertexMeshLightShader, NULL, 0);
+
+	deviceContext->GSGetShader(&m_geometryMeshLightShader, NULL, 0);
+
 	if (UVScrolling)
 	{
 		deviceContext->PSSetShader(m_pixelUVScrollingMeshLightShader, NULL, 0);
-	deviceContext->PSSetSamplers(0, 1, &m_samplerState);
+		deviceContext->PSSetSamplers(0, 1, &m_samplerState);
 	}
 	else if (skyBox)
 	{
@@ -482,7 +495,6 @@ void ShaderInvoker::RenderShader(ID3D11DeviceContext *deviceContext, int indexCo
 
 #endif // MESHLIGHTSH
 
-	// Render the triangle.
 	if (instanceRendering)
 	{
 		deviceContext->DrawIndexedInstanced(indexCount, instanceCount, 0, 0, 0);
