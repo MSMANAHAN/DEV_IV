@@ -32,6 +32,7 @@ float4 SkyBoxMeshLightPixelShader(PixelInputType input) : SV_TARGET
     float3 lightDir;
     float lightIntensity;
     float4 color;
+    
     //x,y,z position before view and projection mult is u,v,w
 
     input.tex[0] = input.skyPos.x;
@@ -40,14 +41,6 @@ float4 SkyBoxMeshLightPixelShader(PixelInputType input) : SV_TARGET
     
     // Sample the pixel color from the texture using the sampler at this texture coordinate location.
     textureColor = shaderTexture.Sample(SampleType, (float3) input.tex);
-
-        // Invert the light direction for calculations.
-    lightDir = -lightDirection;
-
-    // Calculate the amount of light on this pixel.
-    lightIntensity = saturate(dot((float3) input.normals, lightDir));
-    // Determine the final amount of diffuse color based on the diffuse color combined with the light intensity.
-    color = saturate(diffuseColor * lightIntensity);
 
     // Multiply the texture pixel and the final diffuse color to get the final pixel color result.
     color = textureColor;

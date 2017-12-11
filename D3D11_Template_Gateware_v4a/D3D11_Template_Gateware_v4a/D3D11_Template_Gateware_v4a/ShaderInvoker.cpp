@@ -34,6 +34,7 @@ bool ShaderInvoker::Initialize(ID3D11Device *mydevice)
 
 void ShaderInvoker::Shutdown()
 {
+	ShutdownShader();
 }
 
 bool ShaderInvoker::Render(ID3D11DeviceContext *deviceContext, int indexCount, int indexOffset, int instanceCount,
@@ -304,6 +305,19 @@ bool ShaderInvoker::InitializeShader(ID3D11Device* device)
 
 void ShaderInvoker::ShutdownShader()
 {
+
+	if (m_samplerState)
+	{
+		m_samplerState->Release();
+		m_samplerState = 0;
+	}
+
+	if (m_skySamplerState)
+	{	   
+		m_skySamplerState->Release();
+		m_skySamplerState = 0;
+	}
+
 	// Release the light constant buffer.
 	if (m_lightBuffer)
 	{
@@ -358,24 +372,44 @@ void ShaderInvoker::ShutdownShader()
 #endif // TEXTURESH
 
 #if MESHLIGHTSH
-	// Release the pixel shader.
+
+	// Release the vertex shaders
+	if (m_vertexMeshLightShader)
+	{
+		m_vertexMeshLightShader->Release();
+		m_vertexMeshLightShader = 0;
+	}
+
+	if (m_vertexSinMeshLightShader)
+	{			
+		m_vertexSinMeshLightShader->Release();
+		m_vertexSinMeshLightShader = 0;
+	}
+
+	// Release the geometry shader
+	if (m_geometryMeshLightShader)
+	{	  
+		m_geometryMeshLightShader->Release();
+		m_geometryMeshLightShader = 0;
+	}
+
+	// Release the pixel shaders
 	if (m_pixelMeshLightShader)
 	{
 		m_pixelMeshLightShader->Release();
 		m_pixelMeshLightShader = 0;
 	}
 
+	if (m_pixelSkyboxMeshLightShader)
+	{		   
+		m_pixelSkyboxMeshLightShader->Release();
+		m_pixelSkyboxMeshLightShader = 0;
+	}
+
 	if (m_pixelUVScrollingMeshLightShader)
 	{
 		m_pixelUVScrollingMeshLightShader->Release();
 		m_pixelUVScrollingMeshLightShader = 0;
-	}
-
-	// Release the vertex shader.
-	if (m_vertexMeshLightShader)
-	{
-		m_vertexMeshLightShader->Release();
-		m_vertexMeshLightShader = 0;
 	}
 #endif // MESHLIGHTSH
 

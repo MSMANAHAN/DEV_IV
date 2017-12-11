@@ -66,6 +66,15 @@
     <ClInclude Include="knight3.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Rock_6.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Rock.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Asian_Nomad_Old_Man_Body.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">

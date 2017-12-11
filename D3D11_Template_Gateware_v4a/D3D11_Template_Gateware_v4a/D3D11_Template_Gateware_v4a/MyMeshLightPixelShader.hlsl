@@ -38,13 +38,13 @@ float4 MeshLightPixelShader(PixelInputType input) : SV_TARGET
     float3 surfacePos;
     float lightposSurf;
     float3 lightToPixelVec;
-    float radius = 20;
+    float radius = 50;
     float4 greenTint;
     float3 lightDirect;
     float4 lightPosSurface;
-    ambient[0] = .2;
-    ambient[1] = .2;
-    ambient[2] = .2;
+    ambient[0] = .5;
+    ambient[1] = .5;
+    ambient[2] = .5;
     ambient[3] = 0;
 
     // Sample the pixel color from the texture using the sampler at this texture coordinate location.
@@ -56,7 +56,7 @@ float4 MeshLightPixelShader(PixelInputType input) : SV_TARGET
     redTint[3] = 0;
 
     greenTint[0] = 0;
-    greenTint[1] = 1;
+    greenTint[1] = 0;
     greenTint[2] = 0;
     greenTint[3] = 0;
 

@@ -123,6 +123,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Asian_Nomad_Old_Man_Body.h" />
     <ClInclude Include="CameraClass.h" />
     <ClInclude Include="chevalier.h" />
     <ClInclude Include="DirectXTex-master\DDSTextureLoader\DDSTextureLoader.h" />
@@ -134,6 +135,8 @@
     <ClInclude Include="knight3.h" />
     <ClInclude Include="LetsDrawSomeStuff.h" />
     <ClInclude Include="model.h" />
+    <ClInclude Include="Rock.h" />
+    <ClInclude Include="Rock_6.h" />
     <ClInclude Include="Rope Bridge.h" />
     <ClInclude Include="ShaderInvoker.h" />
     <ClInclude Include="sword1.h" />
