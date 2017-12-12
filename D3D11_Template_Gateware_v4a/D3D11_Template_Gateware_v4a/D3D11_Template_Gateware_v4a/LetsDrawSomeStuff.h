@@ -31,13 +31,17 @@
 #include "Asian_Nomad_Old_Man_Body.h"
 #include "ROAD.h"
 #include "CommodoreUte.h"
+#include "talon.h"
+#include "asteroid.h"
 
 using namespace DirectX;
 #define COLOR false
 #define TEXTURE false
 #define MESHLIGHT true
-#define TEXTURECOUNT 13
-
+#define TEXTURECOUNT 18
+#define HolyGrail 0
+#define RoadToVictory 1
+#define Space 2
 // Simple Container class to make life easier/cleaner
 class LetsDrawSomeStuff
 {
@@ -253,6 +257,34 @@ class LetsDrawSomeStuff
 	D3D11_SUBRESOURCE_DATA indexData13;
 #pragma endregion
 
+#pragma region Mesh14
+	ID3D11Buffer *m_vertexBuffer14;
+	ID3D11Buffer *m_indexBuffer14;
+	int m_vertexCount14;
+	int m_indexCount14;
+	D3D11_SHADER_RESOURCE_VIEW_DESC m_ShaderResourceViewDesc14;
+	ID3D11ShaderResourceView* m_shaderResourceView14;
+	ID3D11Resource * m_texture14;
+	D3D11_BUFFER_DESC vertexBufferDesc14;
+	D3D11_BUFFER_DESC indexBufferDesc14;
+	D3D11_SUBRESOURCE_DATA vertexData14;
+	D3D11_SUBRESOURCE_DATA indexData14;
+#pragma endregion
+
+#pragma region Mesh15
+	ID3D11Buffer *m_vertexBuffer15;
+	ID3D11Buffer *m_indexBuffer15;
+	int m_vertexCount15;
+	int m_indexCount15;
+	D3D11_SHADER_RESOURCE_VIEW_DESC m_ShaderResourceViewDesc15;
+	ID3D11ShaderResourceView* m_shaderResourceView15;
+	ID3D11Resource * m_texture15;
+	D3D11_BUFFER_DESC vertexBufferDesc15;
+	D3D11_BUFFER_DESC indexBufferDesc15;
+	D3D11_SUBRESOURCE_DATA vertexData15;
+	D3D11_SUBRESOURCE_DATA indexData15;
+#pragma endregion
+
 #pragma region Skybox
 	ID3D11Buffer *m_vertexBufferSky;
 	ID3D11Buffer *m_indexBufferSky;
@@ -273,6 +305,24 @@ class LetsDrawSomeStuff
 	ID3D11Resource * m_textureSky2;
 #pragma endregion
 
+#pragma region Mars
+	D3D11_SHADER_RESOURCE_VIEW_DESC m_ShaderResourceViewDescMars;
+	ID3D11ShaderResourceView* m_shaderResourceViewMars;
+	ID3D11Resource * m_textureMars;
+#pragma endregion
+
+#pragma region Jupiter
+	D3D11_SHADER_RESOURCE_VIEW_DESC m_ShaderResourceViewDescJupiter;
+	ID3D11ShaderResourceView* m_shaderResourceViewJupiter;
+	ID3D11Resource * m_textureJupiter;
+#pragma endregion
+
+#pragma region Sun
+	D3D11_SHADER_RESOURCE_VIEW_DESC m_ShaderResourceViewDescSun;
+	ID3D11ShaderResourceView* m_shaderResourceViewSun;
+	ID3D11Resource * m_textureSun;
+#pragma endregion
+
 
 public:
 	CameraClass* m_Camera;
@@ -284,12 +334,13 @@ public:
 	// Draw
 	void Render();
 	float rotation = 0;
+	float orbit = 0;
 	float translation = 0;
 	float nearPlane = 0.1f;
 	float farPlane = 50;
 	float zoomFOV = 4;
 	bool UVScrolling = false;
-	bool secondScene = false;
+	int sceneIndex = 0;
 	unsigned int width;
 	unsigned int height;
 	void Execute();
@@ -477,6 +528,46 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 				&m_textureSky2,
 				&m_shaderResourceViewSky2
 			};
+			arrayOfTextures[13] =
+			{
+				13,
+				myDevice,
+				L"talon.dds",
+				&m_texture14,
+				&m_shaderResourceView14
+			};
+			arrayOfTextures[14] =
+			{
+				14,
+				myDevice,
+				L"Earth.dds",
+				&m_texture15,
+				&m_shaderResourceView15
+			};
+			arrayOfTextures[15] =
+			{
+				15,
+				myDevice,
+				L"Mars.dds",
+				&m_textureMars,
+				&m_shaderResourceViewMars
+			};
+			arrayOfTextures[16] =
+			{
+				16,
+				myDevice,
+				L"Jupiter.dds",
+				&m_textureJupiter,
+				&m_shaderResourceViewJupiter
+			};
+			arrayOfTextures[17] =
+			{
+				17,
+				myDevice,
+				L"Sun.dds",
+				&m_textureSun,
+				&m_shaderResourceViewSun
+			};
 #pragma endregion
 
 		for (size_t i = 0; i < TEXTURECOUNT; i++)
@@ -488,6 +579,7 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 		{
 			thread.join();
 		}
+#pragma region Vertex and Index Buffer Initialization
 
 #pragma region Mesh1
 
@@ -1131,6 +1223,94 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			result = myDevice->CreateBuffer(&indexBufferDesc13, &indexData13, &m_indexBuffer13);
 #pragma endregion
 
+#pragma region Mesh14
+			//result = CreateDDSTextureFromFile(myDevice, L"chevalier.dds", &m_texture6, &m_shaderResourceView6, DXGI_ALPHA_MODE_UNSPECIFIED);
+
+			//if (FAILED(result))
+			//{
+			//	cout << "Texture not work";
+			//}
+			// Set the number of vertices in the vertex array.
+			m_vertexCount14 = 1160;
+
+			// Set the number of indices for the pyramid
+			m_indexCount14 = 3024;
+
+			// Set up the description of the static vertex buffer.
+			vertexBufferDesc14.Usage = D3D11_USAGE_DEFAULT;
+			vertexBufferDesc14.ByteWidth = sizeof(_OBJ_VERT_) * m_vertexCount14;
+			vertexBufferDesc14.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+			vertexBufferDesc14.CPUAccessFlags = 0;
+			vertexBufferDesc14.MiscFlags = 0;
+			vertexBufferDesc14.StructureByteStride = 0;
+
+			// Give the subresource structure a pointer to the vertex data.
+			vertexData14.pSysMem = talon_data;
+			vertexData14.SysMemPitch = 0;
+			vertexData14.SysMemSlicePitch = 0;
+
+			// Now create the vertex buffer.
+			result = myDevice->CreateBuffer(&vertexBufferDesc14, &vertexData14, &m_vertexBuffer14);
+
+			// Set up the description of the static index buffer.
+			indexBufferDesc14.Usage = D3D11_USAGE_DEFAULT;
+			indexBufferDesc14.ByteWidth = sizeof(unsigned int) * (m_indexCount14);
+			indexBufferDesc14.BindFlags = D3D11_BIND_INDEX_BUFFER;
+			indexBufferDesc14.CPUAccessFlags = 0;
+			indexBufferDesc14.MiscFlags = 0;
+			indexBufferDesc14.StructureByteStride = 0;
+
+			indexData14.pSysMem = talon_indicies;
+			indexData14.SysMemPitch = 0;
+			indexData14.SysMemSlicePitch = 0;
+			// Create the index buffer.
+			result = myDevice->CreateBuffer(&indexBufferDesc14, &indexData14, &m_indexBuffer14);
+#pragma endregion
+
+#pragma region Mesh15
+			//result = CreateDDSTextureFromFile(myDevice, L"chevalier.dds", &m_texture6, &m_shaderResourceView6, DXGI_ALPHA_MODE_UNSPECIFIED);
+
+			//if (FAILED(result))
+			//{
+			//	cout << "Texture not work";
+			//}
+			// Set the number of vertices in the vertex array.
+			m_vertexCount15 = 954;
+
+			// Set the number of indices for the pyramid
+			m_indexCount15 = 2616;
+
+			// Set up the description of the static vertex buffer.
+			vertexBufferDesc15.Usage = D3D11_USAGE_DEFAULT;
+			vertexBufferDesc15.ByteWidth = sizeof(_OBJ_VERT_) * m_vertexCount15;
+			vertexBufferDesc15.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+			vertexBufferDesc15.CPUAccessFlags = 0;
+			vertexBufferDesc15.MiscFlags = 0;
+			vertexBufferDesc15.StructureByteStride = 0;
+
+			// Give the subresource structure a pointer to the vertex data.
+			vertexData15.pSysMem = asteroid_data;
+			vertexData15.SysMemPitch = 0;
+			vertexData15.SysMemSlicePitch = 0;
+
+			// Now create the vertex buffer.
+			result = myDevice->CreateBuffer(&vertexBufferDesc15, &vertexData15, &m_vertexBuffer15);
+
+			// Set up the description of the static index buffer.
+			indexBufferDesc15.Usage = D3D11_USAGE_DEFAULT;
+			indexBufferDesc15.ByteWidth = sizeof(unsigned int) * (m_indexCount15);
+			indexBufferDesc15.BindFlags = D3D11_BIND_INDEX_BUFFER;
+			indexBufferDesc15.CPUAccessFlags = 0;
+			indexBufferDesc15.MiscFlags = 0;
+			indexBufferDesc15.StructureByteStride = 0;
+
+			indexData15.pSysMem = asteroid_indicies;
+			indexData15.SysMemPitch = 0;
+			indexData15.SysMemSlicePitch = 0;
+			// Create the index buffer.
+			result = myDevice->CreateBuffer(&indexBufferDesc15, &indexData15, &m_indexBuffer15);
+#pragma endregion
+
 #pragma region SkyBox
 			//result = CreateDDSTextureFromFile(myDevice, L"SunsetSkybox.dds", &m_textureSky, &m_shaderResourceViewSky, DXGI_ALPHA_MODE_UNSPECIFIED);
 
@@ -1267,6 +1447,7 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			// Create the index buffer.
 			result = myDevice->CreateBuffer(&indexBufferDescMap, &indexDataMap, &m_indexBufferMap);
 #pragma endregion
+#pragma endregion
 
 			// Create the camera object.
 			m_Camera = new CameraClass;
@@ -1350,8 +1531,6 @@ LetsDrawSomeStuff::LetsDrawSomeStuff(GW::SYSTEM::GWindow* attatchPoint)
 			XMMATRIX mapProjection = XMMatrixOrthographicLH(512, 512, 1.0f, 1000.0f);
 
 #pragma endregion
-
-
 
 			// Release the instance array now that the instance buffer has been created and loaded.
 			delete[] instances;
@@ -1452,7 +1631,19 @@ LetsDrawSomeStuff::~LetsDrawSomeStuff()
 			m_vertexBuffer11->Release();
 			m_vertexBuffer11 = 0;
 		}
-	#pragma endregion
+		
+		if (m_vertexBuffer12)
+		{
+			m_vertexBuffer12->Release();
+			m_vertexBuffer12 = 0;
+		}
+		
+		if (m_vertexBuffer13)
+		{
+			m_vertexBuffer13->Release();
+			m_vertexBuffer13 = 0;
+		}
+#pragma endregion
 
 	#pragma region Release Index Buffers
 
@@ -1525,6 +1716,18 @@ LetsDrawSomeStuff::~LetsDrawSomeStuff()
 			m_indexBuffer11 = 0;
 		}
 
+		if (m_indexBuffer12)
+		{				  
+			m_indexBuffer12->Release();
+			m_indexBuffer12 = 0;
+		}
+
+		if (m_indexBuffer13)
+		{				  
+			m_indexBuffer13->Release();
+			m_indexBuffer13 = 0;
+		}
+
 		if (m_indexBufferSky)
 		{
 			m_indexBufferSky->Release();
@@ -1539,6 +1742,13 @@ LetsDrawSomeStuff::~LetsDrawSomeStuff()
 		{
 			m_shaderResourceViewSky->Release();
 			m_shaderResourceViewSky = 0;
+		}
+
+		// If vertex buffer exists, release and set to 0
+		if (m_shaderResourceViewSky2)
+		{
+			m_shaderResourceViewSky2->Release();
+			m_shaderResourceViewSky2 = 0;
 		}
 
 		// If vertex buffer exists, release and set to 0
@@ -1621,6 +1831,13 @@ LetsDrawSomeStuff::~LetsDrawSomeStuff()
 		}
 
 		// If vertex buffer exists, release and set to 0
+		if (m_textureSky2)
+		{
+			m_textureSky2->Release();
+			m_textureSky2 = 0;
+		}
+
+		// If vertex buffer exists, release and set to 0
 		if (m_texture1)
 		{
 			m_texture1->Release();
@@ -1688,7 +1905,19 @@ LetsDrawSomeStuff::~LetsDrawSomeStuff()
 			m_texture11->Release();
 			m_texture11 = 0;
 		}
-	#pragma endregion
+
+		if (m_texture12)
+		{			  
+			m_texture12->Release();
+			m_texture12 = 0;
+		}
+
+		if (m_texture13)
+		{			  
+			m_texture13->Release();
+			m_texture13 = 0;
+		}
+#pragma endregion
 
 	if (renderTargetTextureMap)
 	{
@@ -1738,6 +1967,7 @@ void LetsDrawSomeStuff::Render()
 		ID3D11RenderTargetView *myRenderTargetView = nullptr;
 		ID3D11DepthStencilView *myDepthStencilView = nullptr;
 		renderTargetViewMap = nullptr;
+
 		D3D11_VIEWPORT miniMap =
 		{
 			0,
@@ -1757,883 +1987,1223 @@ void LetsDrawSomeStuff::Render()
 			0,
 			1
 		};
-		if (!secondScene)
+
+		switch (sceneIndex)
 		{
-			if (G_SUCCESS(mySurface->GetRenderTarget((void**)&myRenderTargetView)))
-			{
-				// Grab the Z Buffer if one was requested
-				if (G_SUCCESS(mySurface->GetDepthStencilView((void**)&myDepthStencilView)))
+			case HolyGrail:
+			{			
+				if (G_SUCCESS(mySurface->GetRenderTarget((void**)&myRenderTargetView)))
 				{
-					myImmContext->ClearDepthStencilView(myDepthStencilView, D3D11_CLEAR_DEPTH, 1, 0); // clear it to Z exponential Far.
-					myDepthStencilView->Release();
-				}
+					// Grab the Z Buffer if one was requested
+					if (G_SUCCESS(mySurface->GetDepthStencilView((void**)&myDepthStencilView)))
+					{
+						myImmContext->ClearDepthStencilView(myDepthStencilView, D3D11_CLEAR_DEPTH, 1, 0); // clear it to Z exponential Far.
+						myDepthStencilView->Release();
+					}
 
-				// Set active target for drawing, all array based D3D11 functions should use a syntax similar to below
-				ID3D11RenderTargetView* const targets[] = { myRenderTargetView };
-				myImmContext->OMSetRenderTargets(1, targets, myDepthStencilView);
-				myImmContext->RSSetViewports(1, &mainScreen);
-				// Clear screen to purple
-				const float purple[] = { .5f, .05f, .5f, 1 };
-				myImmContext->ClearRenderTargetView(myRenderTargetView, purple);
-			
-				// TODO: Set your shaders, Update & Set your constant buffers, Attatch your vertex & index buffers, Set your InputLayout & Topology & Draw!
-				XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
+					// Set active target for drawing, all array based D3D11 functions should use a syntax similar to below
+					ID3D11RenderTargetView* const targets[] = { myRenderTargetView };
+					myImmContext->OMSetRenderTargets(1, targets, myDepthStencilView);
+					myImmContext->RSSetViewports(1, &mainScreen);
+					// Clear screen to purple
+					const float purple[] = { .5f, .05f, .5f, 1 };
+					myImmContext->ClearRenderTargetView(myRenderTargetView, purple);
 
-				//Render Camera
-				m_Camera->Render();
+					// TODO: Set your shaders, Update & Set your constant buffers, Attatch your vertex & index buffers, Set your InputLayout & Topology & Draw!
+					XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
 
-				#pragma region MODEL RENDER
-				// TODO: Set your shaders, Update & Set your constant buffers, Attatch your vertex & index buffers, Set your InputLayout & Topology & Draw!
-				unsigned int stride;
-				unsigned int offset;
+					//Render Camera
+					m_Camera->Render();
+
+	#pragma region MODEL RENDER
+					// TODO: Set your shaders, Update & Set your constant buffers, Attatch your vertex & index buffers, Set your InputLayout & Topology & Draw!
+					unsigned int stride;
+					unsigned int offset;
 
 	#if MESHLIGHT
-				// Set vertex buffer stride and offset.
-				stride = sizeof(_OBJ_VERT_);
-				offset = 0;
+					// Set vertex buffer stride and offset.
+					stride = sizeof(_OBJ_VERT_);
+					offset = 0;
 
 
 	#endif // TEXTURE
 
 
 	#pragma endregion
-			
-				//Set up matrices
-				worldMatrix = DirectX::XMMatrixIdentity();
-				m_Camera->GetViewMatrix(viewMatrix);
 
-				if (height && width)
-				{
-					if (width >= height)
+					//Set up matrices
+					worldMatrix = DirectX::XMMatrixIdentity();
+					m_Camera->GetViewMatrix(viewMatrix);
+
+					if (height && width)
 					{
-						projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(3.14f / zoomFOV, (float)(width / height), nearPlane, farPlane);
-					}																		  
-					else
-						projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(3.14f / zoomFOV, (float)(height / width), nearPlane, farPlane);
-				}
+						if (width >= height)
+						{
+							projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(3.14f / zoomFOV, (float)(width / height), nearPlane, farPlane);
+						}
+						else
+							projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(3.14f / zoomFOV, (float)(height / width), nearPlane, farPlane);
+					}
 
-				m_lightDir = XMFLOAT3(translation, 0, 50);
-				m_diffuseColor = XMFLOAT4(0.6f, 0, 0, 1);
-			
-				#pragma region Mesh1
-							myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView1);
-							// Set the vertex buffer to active in the input assembler so it can be rendered.
-							myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer1, &stride, &offset);
-						
-							// Set the index buffer to active in the input assembler so it can be rendered.
-							myImmContext->IASetIndexBuffer(m_indexBuffer1, DXGI_FORMAT_R32_UINT, 0);
-					
-							// Set the type of primitive that should be rendered from this vertex buffer, in this case triangles.
-							myImmContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-							//Individual Object worldMatrix
-							worldMatrix = XMMatrixMultiply(XMMatrixTranslation(3.0f, -05.0f, -0.0f), XMMatrixRotationRollPitchYaw(90, 0, 0));
-							//INDEXCOUNT, INDEXOFFSET
-							m_ShaderInv->Render(myImmContext, m_vertexCount1, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+					m_lightDir = XMFLOAT3(translation, 0, 50);
+					m_diffuseColor = XMFLOAT4(0.6f, 0, 0, 1);
 
-				#pragma endregion
+	#pragma region Mesh1
+					myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView1);
+					// Set the vertex buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer1, &stride, &offset);
 
-				#pragma region Mesh2
-							//m_ShaderInv->UVScrolling = true;
-							//myContext->PSSetShaderResources(0, 1, &m_shaderResourceView2);
-							//// Set the vertex buffer to active in the input assembler so it can be rendered.
-							//myContext->IASetVertexBuffers(0, 1, &m_vertexBuffer2, &stride, &offset);
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetIndexBuffer(m_indexBuffer1, DXGI_FORMAT_R32_UINT, 0);
 
-							//// Set the index buffer to active in the input assembler so it can be rendered.
-							//myContext->IASetIndexBuffer(m_indexBuffer2, DXGI_FORMAT_R32_UINT, 0);
+					// Set the type of primitive that should be rendered from this vertex buffer, in this case triangles.
+					myImmContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+					//Individual Object worldMatrix
+					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(3.0f, -05.0f, -0.0f), XMMatrixRotationRollPitchYaw(90, 0, 0));
+					//INDEXCOUNT, INDEXOFFSET
+					m_ShaderInv->Render(myImmContext, m_vertexCount1, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
 
-							//// Set the index buffer to active in the input assembler so it can be rendered.
-							//worldMatrix = XMMatrixMultiply(XMMatrixScaling(5, 5, 5), XMMatrixTranslation(m_lightDir.x, m_lightDir.y, m_lightDir.z));
-							//m_ShaderInv->Render(myContext, m_indexCount2, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+	#pragma endregion
 
-							//m_ShaderInv->UVScrolling = true;
-							//myContext->PSSetShaderResources(0, 1, &m_shaderResourceView2);
-							//// Set the vertex buffer to active in the input assembler so it can be rendered.
-							//myContext->IASetVertexBuffers(0, 1, &m_vertexBuffer2, &stride, &offset);
+	#pragma region Mesh2
+					//m_ShaderInv->UVScrolling = true;
+					//myContext->PSSetShaderResources(0, 1, &m_shaderResourceView2);
+					//// Set the vertex buffer to active in the input assembler so it can be rendered.
+					//myContext->IASetVertexBuffers(0, 1, &m_vertexBuffer2, &stride, &offset);
 
-							//// Set the index buffer to active in the input assembler so it can be rendered.
-							//myContext->IASetIndexBuffer(m_indexBuffer2, DXGI_FORMAT_R32_UINT, 0);
+					//// Set the index buffer to active in the input assembler so it can be rendered.
+					//myContext->IASetIndexBuffer(m_indexBuffer2, DXGI_FORMAT_R32_UINT, 0);
 
-							//// Set the index buffer to active in the input assembler so it can be rendered.
-							//worldMatrix = XMMatrixMultiply(XMMatrixScaling(45, 45, 45), XMMatrixTranslation(140 + translation, 25, 60));
-							//m_ShaderInv->Render(myContext, m_indexCount2, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+					//// Set the index buffer to active in the input assembler so it can be rendered.
+					//worldMatrix = XMMatrixMultiply(XMMatrixScaling(5, 5, 5), XMMatrixTranslation(m_lightDir.x, m_lightDir.y, m_lightDir.z));
+					//m_ShaderInv->Render(myContext, m_indexCount2, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
 
-				#pragma endregion
+					//m_ShaderInv->UVScrolling = true;
+					//myContext->PSSetShaderResources(0, 1, &m_shaderResourceView2);
+					//// Set the vertex buffer to active in the input assembler so it can be rendered.
+					//myContext->IASetVertexBuffers(0, 1, &m_vertexBuffer2, &stride, &offset);
 
-				#pragma region Mesh3
-							unsigned int strides[2];
-							unsigned int offsets[2];
-							ID3D11Buffer* bufferPointers[2];
-							m_ShaderInv->instanceRendering = true;
-							// Set the buffer strides.
-							strides[0] = sizeof(_OBJ_VERT_);
-							strides[1] = sizeof(InstanceType);
+					//// Set the index buffer to active in the input assembler so it can be rendered.
+					//myContext->IASetIndexBuffer(m_indexBuffer2, DXGI_FORMAT_R32_UINT, 0);
 
-							// Set the buffer offsets.
-							offsets[0] = 0;
-							offsets[1] = 0;
-							// Set the array of pointers to the vertex and instance buffers.
-							bufferPointers[0] = m_vertexBuffer3;
-							bufferPointers[1] = m_instanceBuffer;
-							m_ShaderInv->UVScrolling = false;
-							m_ShaderInv->instanceRendering = true;
+					//// Set the index buffer to active in the input assembler so it can be rendered.
+					//worldMatrix = XMMatrixMultiply(XMMatrixScaling(45, 45, 45), XMMatrixTranslation(140 + translation, 25, 60));
+					//m_ShaderInv->Render(myContext, m_indexCount2, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
 
-							//Grass
-							myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView3);
-							// Set the vertex buffer to active in the input assembler so it can be rendered.
-							myImmContext->IASetVertexBuffers(0, 2, bufferPointers, strides, offsets);
+	#pragma endregion
 
-							// Set the index buffer to active in the input assembler so it can be rendered.
-							myImmContext->IASetIndexBuffer(m_indexBuffer3, DXGI_FORMAT_R32_UINT, 0);
-							worldMatrix = XMMatrixMultiply(XMMatrixTranslation(0, 4.0f, 10), XMMatrixScaling(1.0f, 1.0f, 1.0f));
-							m_ShaderInv->Render(myImmContext, m_indexCount3, 0, m_instanceCount, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
-							m_ShaderInv->instanceRendering = false;
-				#pragma endregion
+	#pragma region Mesh3
+					unsigned int strides[2];
+					unsigned int offsets[2];
+					ID3D11Buffer* bufferPointers[2];
+					m_ShaderInv->instanceRendering = true;
+					// Set the buffer strides.
+					strides[0] = sizeof(_OBJ_VERT_);
+					strides[1] = sizeof(InstanceType);
 
-				#pragma region Mesh4
+					// Set the buffer offsets.
+					offsets[0] = 0;
+					offsets[1] = 0;
+					// Set the array of pointers to the vertex and instance buffers.
+					bufferPointers[0] = m_vertexBuffer3;
+					bufferPointers[1] = m_instanceBuffer;
+					m_ShaderInv->UVScrolling = false;
+					m_ShaderInv->instanceRendering = true;
+
+					//Grass
+					myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView3);
+					// Set the vertex buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetVertexBuffers(0, 2, bufferPointers, strides, offsets);
+
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetIndexBuffer(m_indexBuffer3, DXGI_FORMAT_R32_UINT, 0);
+					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(0, 4.0f, 10), XMMatrixScaling(1.0f, 1.0f, 1.0f));
+					m_ShaderInv->Render(myImmContext, m_indexCount3, 0, m_instanceCount, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+					m_ShaderInv->instanceRendering = false;
+	#pragma endregion
+
+	#pragma region Mesh4
 	#if 0
-							myContext->PSSetShaderResources(0, 1, &m_shaderResourceView4);
-				//			 Set the vertex buffer to active in the input assembler so it can be rendered.
-							myContext->IASetVertexBuffers(0, 1, &m_vertexBuffer4, &stride, &offset);
+					myContext->PSSetShaderResources(0, 1, &m_shaderResourceView4);
+					//			 Set the vertex buffer to active in the input assembler so it can be rendered.
+					myContext->IASetVertexBuffers(0, 1, &m_vertexBuffer4, &stride, &offset);
 
-							// Set the index buffer to active in the input assembler so it can be rendered.
-							myContext->IASetIndexBuffer(m_indexBuffer4, DXGI_FORMAT_R32_UINT, 0);
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					myContext->IASetIndexBuffer(m_indexBuffer4, DXGI_FORMAT_R32_UINT, 0);
 
-							// Set the type of primitive that should be rendered from this vertex buffer, in this case triangles.
-							myContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
+					// Set the type of primitive that should be rendered from this vertex buffer, in this case triangles.
+					myContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
 
-							// Set the index buffer to active in the input assembler so it can be rendered.
-							worldMatrix = XMMatrixMultiply(XMMatrixScaling(45, 45, 45), XMMatrixTranslation(-translation, 4, 60));
-							m_ShaderInv->Render(myContext, m_indexCount4, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					worldMatrix = XMMatrixMultiply(XMMatrixScaling(45, 45, 45), XMMatrixTranslation(-translation, 4, 60));
+					m_ShaderInv->Render(myContext, m_indexCount4, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
 
 	#endif // 0
 
-				#pragma endregion
+	#pragma endregion
 
-				#pragma region Mesh5
-							m_ShaderInv->sinRendering = true;
-							myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView5);
-							// Set the vertex buffer to active in the input assembler so it can be rendered.
-							myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer5, &stride, &offset);
+	#pragma region Mesh5
+					m_ShaderInv->sinRendering = true;
+					myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView5);
+					// Set the vertex buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer5, &stride, &offset);
 
-							// Set the index buffer to active in the input assembler so it can be rendered.
-							myImmContext->IASetIndexBuffer(m_indexBuffer5, DXGI_FORMAT_R32_UINT, 0);
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetIndexBuffer(m_indexBuffer5, DXGI_FORMAT_R32_UINT, 0);
 
-							// Set the index buffer to active in the input assembler so it can be rendered.
-							worldMatrix = XMMatrixMultiply(XMMatrixScaling(3, 3, 3), XMMatrixTranslation(0, 8, 140));
-							m_ShaderInv->Render(myImmContext, m_indexCount5, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
-							m_ShaderInv->sinRendering = false;
-
-				#pragma endregion
-
-				#pragma region Mesh6
-							myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView6);
-							// Set the vertex buffer to active in the input assembler so it can be rendered.
-							myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer6, &stride, &offset);
-
-							// Set the index buffer to active in the input assembler so it can be rendered.
-							myImmContext->IASetIndexBuffer(m_indexBuffer6, DXGI_FORMAT_R32_UINT, 0);
-
-							// Set the index buffer to active in the input assembler so it can be rendered.
-							worldMatrix = XMMatrixMultiply(XMMatrixScaling(6, 6, 6), XMMatrixTranslation(-100, 5, 170));
-							worldMatrix = XMMatrixMultiply(XMMatrixRotationRollPitchYaw(0, 3.14159265f, 0), worldMatrix);
-
-							m_ShaderInv->Render(myImmContext, m_indexCount6, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
-
-				#pragma endregion
-
-				#pragma region Mesh7
-				myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView7);
-				// Set the vertex buffer to active in the input assembler so it can be rendered.
-				myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer7, &stride, &offset);
-
-				// Set the index buffer to active in the input assembler so it can be rendered.
-				myImmContext->IASetIndexBuffer(m_indexBuffer7, DXGI_FORMAT_R32_UINT, 0);
-
-				// Set the index buffer to active in the input assembler so it can be rendered.
-				worldMatrix = XMMatrixMultiply(XMMatrixScaling(.1f, .1f, .1f), XMMatrixTranslation(-10, 4, 50));
-				m_ShaderInv->Render(myImmContext, m_indexCount7, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
-
-				#pragma endregion
-
-				#pragma region Mesh8
-				myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView8);
-				// Set the vertex buffer to active in the input assembler so it can be rendered.
-				myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer8, &stride, &offset);
-
-				// Set the index buffer to active in the input assembler so it can be rendered.
-				myImmContext->IASetIndexBuffer(m_indexBuffer8, DXGI_FORMAT_R32_UINT, 0);
-
-				// Set the index buffer to active in the input assembler so it can be rendered.
-				worldMatrix = XMMatrixMultiply(XMMatrixRotationRollPitchYaw(55 , 3.14159265f, 0), XMMatrixTranslation(-100, -3, 160));
-				worldMatrix = XMMatrixMultiply(XMMatrixScaling(.3f, .3f, .3f), worldMatrix);
-				m_ShaderInv->Render(myImmContext, m_indexCount8, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
-
-				#pragma endregion
-
-				#pragma region Mesh9
-				myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView9);
-				// Set the vertex buffer to active in the input assembler so it can be rendered.
-				myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer9, &stride, &offset);
-
-				// Set the index buffer to active in the input assembler so it can be rendered.
-				myImmContext->IASetIndexBuffer(m_indexBuffer9, DXGI_FORMAT_R32_UINT, 0);
-
-				// Set the index buffer to active in the input assembler so it can be rendered.
-				worldMatrix = XMMatrixMultiply(XMMatrixScaling(80, 200, 120), XMMatrixTranslation(25, -60, -180));
-				worldMatrix = XMMatrixMultiply(XMMatrixRotationRollPitchYaw(0,.5,0), worldMatrix);
-				m_ShaderInv->Render(myImmContext, m_indexCount9, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					worldMatrix = XMMatrixMultiply(XMMatrixScaling(3, 3, 3), XMMatrixTranslation(0, 8, 140));
+					m_ShaderInv->Render(myImmContext, m_indexCount5, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+					m_ShaderInv->sinRendering = false;
 
 	#pragma endregion
 
-				#pragma region Mesh10
-				myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView10);
-				// Set the vertex buffer to active in the input assembler so it can be rendered.
-				myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer10, &stride, &offset);
+	#pragma region Mesh6
+					myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView6);
+					// Set the vertex buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer6, &stride, &offset);
 
-				// Set the index buffer to active in the input assembler so it can be rendered.
-				myImmContext->IASetIndexBuffer(m_indexBuffer10, DXGI_FORMAT_R32_UINT, 0);
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetIndexBuffer(m_indexBuffer6, DXGI_FORMAT_R32_UINT, 0);
 
-				// Set the index buffer to active in the input assembler so it can be rendered.
-				worldMatrix = XMMatrixMultiply(XMMatrixScaling(1,1,1), XMMatrixTranslation(5, -45, 0));
-				worldMatrix = XMMatrixMultiply(XMMatrixRotationRollPitchYaw(0, .5, 0), worldMatrix);
-				m_ShaderInv->Render(myImmContext, m_indexCount10, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					worldMatrix = XMMatrixMultiply(XMMatrixScaling(6, 6, 6), XMMatrixTranslation(-100, 5, 170));
+					worldMatrix = XMMatrixMultiply(XMMatrixRotationRollPitchYaw(0, 3.14159265f, 0), worldMatrix);
 
-				// Set the index buffer to active in the input assembler so it can be rendered.
-				worldMatrix = XMMatrixMultiply(XMMatrixScaling(1, 1, 1), XMMatrixTranslation(5, -25, 240));
-				worldMatrix = XMMatrixMultiply(XMMatrixRotationRollPitchYaw(0, .5, 0), worldMatrix);
-				m_ShaderInv->Render(myImmContext, m_indexCount10, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+					m_ShaderInv->Render(myImmContext, m_indexCount6, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
 
 	#pragma endregion
 
-				#pragma region Mesh11
-				myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView11);
-				// Set the vertex buffer to active in the input assembler so it can be rendered.
-				myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer11, &stride, &offset);
+	#pragma region Mesh7
+					myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView7);
+					// Set the vertex buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer7, &stride, &offset);
 
-				// Set the index buffer to active in the input assembler so it can be rendered.
-				myImmContext->IASetIndexBuffer(m_indexBuffer11, DXGI_FORMAT_R32_UINT, 0);
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetIndexBuffer(m_indexBuffer7, DXGI_FORMAT_R32_UINT, 0);
 
-				// Set the index buffer to active in the input assembler so it can be rendered.
-				worldMatrix = XMMatrixMultiply(XMMatrixScaling(.05f, .05f, .05f), XMMatrixTranslation(-10, 5, 60));
-				worldMatrix = XMMatrixMultiply(XMMatrixRotationRollPitchYaw(0, 3.14159265f, 0), worldMatrix);
-				m_ShaderInv->Render(myImmContext, m_indexCount11, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					worldMatrix = XMMatrixMultiply(XMMatrixScaling(.1f, .1f, .1f), XMMatrixTranslation(-10, 4, 50));
+					m_ShaderInv->Render(myImmContext, m_indexCount7, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
 
 	#pragma endregion
 
-				#pragma region Skybox
-				m_ShaderInv->skyBox = true;
-				myImmContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	#pragma region Mesh8
+					myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView8);
+					// Set the vertex buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer8, &stride, &offset);
 
-				myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceViewSky);
-				// Set the vertex buffer to active in the input assembler so it can be rendered.
-				myImmContext->IASetVertexBuffers(0, 1, &m_vertexBufferSky, &stride, &offset);
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetIndexBuffer(m_indexBuffer8, DXGI_FORMAT_R32_UINT, 0);
 
-				// Set the index buffer to active in the input assembler so it can be rendered.
-				myImmContext->IASetIndexBuffer(m_indexBufferSky, DXGI_FORMAT_R32_UINT, 0);
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					worldMatrix = XMMatrixMultiply(XMMatrixRotationRollPitchYaw(55, 3.14159265f, 0), XMMatrixTranslation(-100, -3, 160));
+					worldMatrix = XMMatrixMultiply(XMMatrixScaling(.3f, .3f, .3f), worldMatrix);
+					m_ShaderInv->Render(myImmContext, m_indexCount8, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
 
-				// Set the index buffer to active in the input assembler so it can be rendered.
-				worldMatrix = XMMatrixMultiply(XMMatrixScaling(800.0f, 800.0f, 800.0f), XMMatrixTranslation((float)(m_Camera->m_positionX + 2000), (float)(m_Camera->m_positionY + 9), (float)(m_Camera->m_positionZ - 760)));
-				m_ShaderInv->Render(myImmContext, m_indexCountSky, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
-				m_ShaderInv->skyBox = false;
+	#pragma endregion
 
-				#pragma endregion
+	#pragma region Mesh9
+					myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView9);
+					// Set the vertex buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer9, &stride, &offset);
 
-			}
-			if (G_SUCCESS(mySurface->GetRenderTarget((void**)&myRenderTargetView)))
-			{
-				// Grab the Z Buffer if one was requested
-				if (G_SUCCESS(mySurface->GetDepthStencilView((void**)&myDepthStencilView)))
-				{
-					myImmContext->ClearDepthStencilView(myDepthStencilView, D3D11_CLEAR_DEPTH, 1, 0); // clear it to Z exponential Far.
-					myDepthStencilView->Release();
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetIndexBuffer(m_indexBuffer9, DXGI_FORMAT_R32_UINT, 0);
+
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					worldMatrix = XMMatrixMultiply(XMMatrixScaling(80, 200, 120), XMMatrixTranslation(25, -60, -180));
+					worldMatrix = XMMatrixMultiply(XMMatrixRotationRollPitchYaw(0, .5, 0), worldMatrix);
+					m_ShaderInv->Render(myImmContext, m_indexCount9, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+
+	#pragma endregion
+
+	#pragma region Mesh10
+					myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView10);
+					// Set the vertex buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer10, &stride, &offset);
+
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetIndexBuffer(m_indexBuffer10, DXGI_FORMAT_R32_UINT, 0);
+
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					worldMatrix = XMMatrixMultiply(XMMatrixScaling(1, 1, 1), XMMatrixTranslation(5, -45, 0));
+					worldMatrix = XMMatrixMultiply(XMMatrixRotationRollPitchYaw(0, .5, 0), worldMatrix);
+					m_ShaderInv->Render(myImmContext, m_indexCount10, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					worldMatrix = XMMatrixMultiply(XMMatrixScaling(1, 1, 1), XMMatrixTranslation(5, -25, 240));
+					worldMatrix = XMMatrixMultiply(XMMatrixRotationRollPitchYaw(0, .5, 0), worldMatrix);
+					m_ShaderInv->Render(myImmContext, m_indexCount10, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+
+	#pragma endregion
+
+	#pragma region Mesh11
+					myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView11);
+					// Set the vertex buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer11, &stride, &offset);
+
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetIndexBuffer(m_indexBuffer11, DXGI_FORMAT_R32_UINT, 0);
+
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					worldMatrix = XMMatrixMultiply(XMMatrixScaling(.05f, .05f, .05f), XMMatrixTranslation(-10, 5, 60));
+					worldMatrix = XMMatrixMultiply(XMMatrixRotationRollPitchYaw(0, 3.14159265f, 0), worldMatrix);
+					m_ShaderInv->Render(myImmContext, m_indexCount11, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+
+	#pragma endregion
+
+	#pragma region Skybox
+					m_ShaderInv->skyBox = true;
+					myImmContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+					myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceViewSky);
+					// Set the vertex buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetVertexBuffers(0, 1, &m_vertexBufferSky, &stride, &offset);
+
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetIndexBuffer(m_indexBufferSky, DXGI_FORMAT_R32_UINT, 0);
+
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					worldMatrix = XMMatrixMultiply(XMMatrixScaling(800.0f, 800.0f, 800.0f), XMMatrixTranslation((float)(m_Camera->m_positionX + 2000), (float)(m_Camera->m_positionY + 9), (float)(m_Camera->m_positionZ - 760)));
+					m_ShaderInv->Render(myImmContext, m_indexCountSky, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+					m_ShaderInv->skyBox = false;
+
+	#pragma endregion
+
 				}
-
-				// Set active target for drawing, all array based D3D11 functions should use a syntax similar to below
-				ID3D11RenderTargetView* const targets[] = { myRenderTargetView };
-				myImmContext->OMSetRenderTargets(1, targets, myDepthStencilView);
-				myImmContext->RSSetViewports(1, &mainScreen);
-
-				// Clear screen to purple
-				const float purple[] = { .5f, .05f, .5f, 1 };
-				//myImmContext->ClearRenderTargetView(myRenderTargetView, purple);
-
-				// TODO: Set your shaders, Update & Set your constant buffers, Attatch your vertex & index buffers, Set your InputLayout & Topology & Draw!
-				XMMATRIX worldMatrix;// , viewMatrix, projectionMatrix;
-
-
-				#pragma region MODEL RENDER
-				// TODO: Set your shaders, Update & Set your constant buffers, Attatch your vertex & index buffers, Set your InputLayout & Topology & Draw!
-				unsigned int stride;
-				unsigned int offset;
-
-	#if MESHLIGHT
-				// Set vertex buffer stride and offset.
-				stride = sizeof(_OBJ_VERT_);
-				offset = 0;
-
-
-	#endif // TEXTURE
-
-
-	#pragma endregion
-
-
-				myImmContext->IASetIndexBuffer(m_indexBufferMap, DXGI_FORMAT_R32_UINT, 0);
-				myImmContext->IASetVertexBuffers(0, 1, &m_vertexBufferSky, &stride, &offset);
-
-				// Just set the WVP to a scale and translate, which will put the square into the bottom right corner of the screen
-				worldMatrix = XMMatrixScaling(0.35f, 0.35f, 0.0f) * XMMatrixTranslation(0.40f, -0.65f, 0.0f);
-				myImmContext->PSSetShaderResources(0, 1, &shaderResourceViewMap);    // Draw the map to the square
-
-				myImmContext->RSSetState(CWcullMode);
-				//Draw the second cube
-				m_ShaderInv->Render(myImmContext, 6, 0, 0, worldMatrix, XMMatrixIdentity(), XMMatrixIdentity(), m_lightDir, m_diffuseColor);
-			}
-			if (G_SUCCESS(mySurface->GetRenderTarget((void**)&renderTargetViewMap)))
-			{
-				// Grab the Z Buffer if one was requested
-				if (G_SUCCESS(mySurface->GetDepthStencilView((void**)&myDepthStencilView)))
+				if (G_SUCCESS(mySurface->GetRenderTarget((void**)&myRenderTargetView)))
 				{
-					myImmContext->ClearDepthStencilView(myDepthStencilView, D3D11_CLEAR_DEPTH, 1, 0); // clear it to Z exponential Far.
-					myDepthStencilView->Release();
-				}
-
-				// Set our maps Render Target
-				myImmContext->OMSetRenderTargets(1, &renderTargetViewMap, myDepthStencilView);
-				myImmContext->RSSetViewports(1, &miniMap);
-				// Clear screen to purple
-				const float purple[] = { .5f, .05f, .5f, 1 };
-				//myImmContext->ClearRenderTargetView(renderTargetViewMap, purple);
-
-				// TODO: Set your shaders, Update & Set your constant buffers, Attatch your vertex & index buffers, Set your InputLayout & Topology & Draw!
-				XMMATRIX worldMatrix ;// viewMatrix, projectionMatrix;
-
-				//Render Camera
-				//m_Camera->Render();
-
-				#pragma region MODEL RENDER
-				// TODO: Set your shaders, Update & Set your constant buffers, Attatch your vertex & index buffers, Set your InputLayout & Topology & Draw!
-				unsigned int stride;
-				unsigned int offset;
-
-	#if MESHLIGHT
-				// Set vertex buffer stride and offset.
-				stride = sizeof(_OBJ_VERT_);
-				offset = 0;
-
-
-	#endif // TEXTURE
-
-
-	#pragma endregion
-
-				//Set up matrices
-				worldMatrix = DirectX::XMMatrixIdentity();
-				//m_Camera->GetViewMatrix(mapView);
-
-				m_lightDir = XMFLOAT3(translation, 0, 50);
-				m_diffuseColor = XMFLOAT4(0, 0, .6f, 1);
-				XMMATRIX mapProjection = XMMatrixOrthographicLH(256, 256, nearPlane, farPlane);
-
-				#pragma region Mesh1
-							myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView1);
-							// Set the vertex buffer to active in the input assembler so it can be rendered.
-							myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer1, &stride, &offset);
-
-							// Set the index buffer to active in the input assembler so it can be rendered.
-							myImmContext->IASetIndexBuffer(m_indexBuffer1, DXGI_FORMAT_R32_UINT, 0);
-
-							// Set the type of primitive that should be rendered from this vertex buffer, in this case triangles.
-							myImmContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-							//Individual Object worldMatrix
-							worldMatrix = XMMatrixMultiply(XMMatrixTranslation(3.0f, -05.0f, -0.0f), XMMatrixRotationRollPitchYaw(90, 0, 0));
-							//INDEXCOUNT, INDEXOFFSET
-							m_ShaderInv->Render(myImmContext, m_vertexCount1, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
-				#pragma endregion
-
-				#pragma region Mesh2
-							//m_ShaderInv->UVScrolling = true;
-							//myContext->PSSetShaderResources(0, 1, &m_shaderResourceView2);
-							//// Set the vertex buffer to active in the input assembler so it can be rendered.
-							//myContext->IASetVertexBuffers(0, 1, &m_vertexBuffer2, &stride, &offset);
-
-							//// Set the index buffer to active in the input assembler so it can be rendered.
-							//myContext->IASetIndexBuffer(m_indexBuffer2, DXGI_FORMAT_R32_UINT, 0);
-
-							//// Set the index buffer to active in the input assembler so it can be rendered.
-							//worldMatrix = XMMatrixMultiply(XMMatrixScaling(5, 5, 5), XMMatrixTranslation(m_lightDir.x, m_lightDir.y, m_lightDir.z));
-							//m_ShaderInv->Render(myContext, m_indexCount2, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
-
-							//m_ShaderInv->UVScrolling = true;
-							//myContext->PSSetShaderResources(0, 1, &m_shaderResourceView2);
-							//// Set the vertex buffer to active in the input assembler so it can be rendered.
-							//myContext->IASetVertexBuffers(0, 1, &m_vertexBuffer2, &stride, &offset);
-
-							//// Set the index buffer to active in the input assembler so it can be rendered.
-							//myContext->IASetIndexBuffer(m_indexBuffer2, DXGI_FORMAT_R32_UINT, 0);
-
-							//// Set the index buffer to active in the input assembler so it can be rendered.
-							//worldMatrix = XMMatrixMultiply(XMMatrixScaling(45, 45, 45), XMMatrixTranslation(140 + translation, 25, 60));
-							//m_ShaderInv->Render(myContext, m_indexCount2, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
-
-				#pragma endregion
-
-				#pragma region Mesh3
-							unsigned int strides[2];
-							unsigned int offsets[2];
-							ID3D11Buffer* bufferPointers[2];
-							m_ShaderInv->instanceRendering = true;
-							// Set the buffer strides.
-							strides[0] = sizeof(_OBJ_VERT_);
-							strides[1] = sizeof(InstanceType);
-
-							// Set the buffer offsets.
-							offsets[0] = 0;
-							offsets[1] = 0;
-							// Set the array of pointers to the vertex and instance buffers.
-							bufferPointers[0] = m_vertexBuffer3;
-							bufferPointers[1] = m_instanceBuffer;
-							m_ShaderInv->UVScrolling = false;
-							m_ShaderInv->instanceRendering = true;
-
-							//Grass
-							myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView3);
-							// Set the vertex buffer to active in the input assembler so it can be rendered.
-							myImmContext->IASetVertexBuffers(0, 2, bufferPointers, strides, offsets);
-
-							// Set the index buffer to active in the input assembler so it can be rendered.
-							myImmContext->IASetIndexBuffer(m_indexBuffer3, DXGI_FORMAT_R32_UINT, 0);
-							worldMatrix = XMMatrixMultiply(XMMatrixTranslation(0, 4.0f, 10), XMMatrixScaling(1.0f, 1.0f, 1.0f));
-							m_ShaderInv->Render(myImmContext, m_indexCount3, 0, m_instanceCount, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
-							m_ShaderInv->instanceRendering = false;
-				#pragma endregion
-
-				#pragma region Mesh4
-				#if 0
-							myContext->PSSetShaderResources(0, 1, &m_shaderResourceView4);
-							//			 Set the vertex buffer to active in the input assembler so it can be rendered.
-							myContext->IASetVertexBuffers(0, 1, &m_vertexBuffer4, &stride, &offset);
-
-							// Set the index buffer to active in the input assembler so it can be rendered.
-							myContext->IASetIndexBuffer(m_indexBuffer4, DXGI_FORMAT_R32_UINT, 0);
-
-							// Set the type of primitive that should be rendered from this vertex buffer, in this case triangles.
-							myContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
-
-							// Set the index buffer to active in the input assembler so it can be rendered.
-							worldMatrix = XMMatrixMultiply(XMMatrixScaling(45, 45, 45), XMMatrixTranslation(-translation, 4, 60));
-							m_ShaderInv->Render(myContext, m_indexCount4, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
-
-				#endif // 0
-
-				#pragma endregion
-
-				#pragma region Mesh5
-							m_ShaderInv->sinRendering = true;
-							myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView5);
-							// Set the vertex buffer to active in the input assembler so it can be rendered.
-							myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer5, &stride, &offset);
-
-							// Set the index buffer to active in the input assembler so it can be rendered.
-							myImmContext->IASetIndexBuffer(m_indexBuffer5, DXGI_FORMAT_R32_UINT, 0);
-
-							// Set the index buffer to active in the input assembler so it can be rendered.
-							worldMatrix = XMMatrixMultiply(XMMatrixScaling(3, 3, 3), XMMatrixTranslation(0, 8, 140));
-							m_ShaderInv->Render(myImmContext, m_indexCount5, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
-							m_ShaderInv->sinRendering = false;
-
-				#pragma endregion
-
-				#pragma region Mesh6
-							myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView6);
-							// Set the vertex buffer to active in the input assembler so it can be rendered.
-							myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer6, &stride, &offset);
-
-							// Set the index buffer to active in the input assembler so it can be rendered.
-							myImmContext->IASetIndexBuffer(m_indexBuffer6, DXGI_FORMAT_R32_UINT, 0);
-
-							// Set the index buffer to active in the input assembler so it can be rendered.
-							worldMatrix = XMMatrixMultiply(XMMatrixScaling(6, 6, 6), XMMatrixTranslation(-100, 5, 170));
-							worldMatrix = XMMatrixMultiply(XMMatrixRotationRollPitchYaw(0, 3.14159265f, 0), worldMatrix);
-
-							m_ShaderInv->Render(myImmContext, m_indexCount6, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
-
-				#pragma endregion
-
-				#pragma region Mesh7
-							myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView7);
-							// Set the vertex buffer to active in the input assembler so it can be rendered.
-							myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer7, &stride, &offset);
-
-							// Set the index buffer to active in the input assembler so it can be rendered.
-							myImmContext->IASetIndexBuffer(m_indexBuffer7, DXGI_FORMAT_R32_UINT, 0);
-
-							// Set the index buffer to active in the input assembler so it can be rendered.
-							worldMatrix = XMMatrixMultiply(XMMatrixScaling(.1f, .1f, .1f), XMMatrixTranslation(-10, 4, 50));
-							m_ShaderInv->Render(myImmContext, m_indexCount7, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
-
-				#pragma endregion
-
-				#pragma region Mesh8
-							myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView8);
-							// Set the vertex buffer to active in the input assembler so it can be rendered.
-							myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer8, &stride, &offset);
-
-							// Set the index buffer to active in the input assembler so it can be rendered.
-							myImmContext->IASetIndexBuffer(m_indexBuffer8, DXGI_FORMAT_R32_UINT, 0);
-
-							// Set the index buffer to active in the input assembler so it can be rendered.
-							worldMatrix = XMMatrixMultiply(XMMatrixRotationRollPitchYaw(55, 3.14159265f, 0), XMMatrixTranslation(-100, -3, 160));
-							worldMatrix = XMMatrixMultiply(XMMatrixScaling(.3f, .3f, .3f), worldMatrix);
-							m_ShaderInv->Render(myImmContext, m_indexCount8, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
-
-				#pragma endregion
-
-				#pragma region Mesh9
-							myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView9);
-							// Set the vertex buffer to active in the input assembler so it can be rendered.
-							myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer9, &stride, &offset);
-
-							// Set the index buffer to active in the input assembler so it can be rendered.
-							myImmContext->IASetIndexBuffer(m_indexBuffer9, DXGI_FORMAT_R32_UINT, 0);
-
-							// Set the index buffer to active in the input assembler so it can be rendered.
-							worldMatrix = XMMatrixMultiply(XMMatrixScaling(80, 200, 120), XMMatrixTranslation(25, -60, -180));
-							worldMatrix = XMMatrixMultiply(XMMatrixRotationRollPitchYaw(0, .5, 0), worldMatrix);
-							m_ShaderInv->Render(myImmContext, m_indexCount9, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
-
-				#pragma endregion
-
-				#pragma region Mesh10
-							myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView10);
-							// Set the vertex buffer to active in the input assembler so it can be rendered.
-							myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer10, &stride, &offset);
-
-							// Set the index buffer to active in the input assembler so it can be rendered.
-							myImmContext->IASetIndexBuffer(m_indexBuffer10, DXGI_FORMAT_R32_UINT, 0);
-
-							// Set the index buffer to active in the input assembler so it can be rendered.
-							worldMatrix = XMMatrixMultiply(XMMatrixScaling(1, 1, 1), XMMatrixTranslation(5, -45, 0));
-							worldMatrix = XMMatrixMultiply(XMMatrixRotationRollPitchYaw(0, .5, 0), worldMatrix);
-							m_ShaderInv->Render(myImmContext, m_indexCount10, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
-
-							// Set the index buffer to active in the input assembler so it can be rendered.
-							worldMatrix = XMMatrixMultiply(XMMatrixScaling(1, 1, 1), XMMatrixTranslation(5, -25, 240));
-							worldMatrix = XMMatrixMultiply(XMMatrixRotationRollPitchYaw(0, .5, 0), worldMatrix);
-							m_ShaderInv->Render(myImmContext, m_indexCount10, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
-
-				#pragma endregion
-
-				#pragma region Mesh11
-							myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView11);
-							// Set the vertex buffer to active in the input assembler so it can be rendered.
-							myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer11, &stride, &offset);
-
-							// Set the index buffer to active in the input assembler so it can be rendered.
-							myImmContext->IASetIndexBuffer(m_indexBuffer11, DXGI_FORMAT_R32_UINT, 0);
-
-							// Set the index buffer to active in the input assembler so it can be rendered.
-							worldMatrix = XMMatrixMultiply(XMMatrixScaling(.05f, .05f, .05f), XMMatrixTranslation(-10, 5, 60));
-							worldMatrix = XMMatrixMultiply(XMMatrixRotationRollPitchYaw(0, 3.14159265f, 0), worldMatrix);
-							m_ShaderInv->Render(myImmContext, m_indexCount11, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
-
-				#pragma endregion
-			}
-		}
-		if (secondScene)
-		{
-			if (G_SUCCESS(mySurface->GetRenderTarget((void**)&myRenderTargetView)))
-			{
-				// Grab the Z Buffer if one was requested
-				if (G_SUCCESS(mySurface->GetDepthStencilView((void**)&myDepthStencilView)))
-				{
-					myImmContext->ClearDepthStencilView(myDepthStencilView, D3D11_CLEAR_DEPTH, 1, 0); // clear it to Z exponential Far.
-					myDepthStencilView->Release();
-				}
-
-				// Set active target for drawing, all array based D3D11 functions should use a syntax similar to below
-				ID3D11RenderTargetView* const targets[] = { myRenderTargetView };
-				myImmContext->OMSetRenderTargets(1, targets, myDepthStencilView);
-				myImmContext->RSSetViewports(1, &mainScreen);
-
-				// Clear screen to purple
-				const float purple[] = { .5f, .05f, .5f, 1 };
-				myImmContext->ClearRenderTargetView(myRenderTargetView, purple);
-
-				// TODO: Set your shaders, Update & Set your constant buffers, Attatch your vertex & index buffers, Set your InputLayout & Topology & Draw!
-				XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
-
-				//Render Camera
-				m_Camera->Render();
-
-				#pragma region MODEL RENDER
-				// TODO: Set your shaders, Update & Set your constant buffers, Attatch your vertex & index buffers, Set your InputLayout & Topology & Draw!
-				unsigned int stride;
-				unsigned int offset;
-
-	#if MESHLIGHT
-				// Set vertex buffer stride and offset.
-				stride = sizeof(_OBJ_VERT_);
-				offset = 0;
-	#endif
-
-	#pragma endregion
-
-				//Set up matrices
-				worldMatrix = DirectX::XMMatrixIdentity();
-				m_Camera->GetViewMatrix(viewMatrix);
-
-				if (height && width)
-				{
-					if (width >= height)
+					// Grab the Z Buffer if one was requested
+					if (G_SUCCESS(mySurface->GetDepthStencilView((void**)&myDepthStencilView)))
 					{
-						projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(3.14f / zoomFOV, (float)(width / height), nearPlane, farPlane);
+						myImmContext->ClearDepthStencilView(myDepthStencilView, D3D11_CLEAR_DEPTH, 1, 0); // clear it to Z exponential Far.
+						myDepthStencilView->Release();
 					}
-					else
-						projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(3.14f / zoomFOV, (float)(height / width), nearPlane, farPlane);
-				}
 
-				m_lightDir = XMFLOAT3(translation, 0, 50);
-				m_diffuseColor = XMFLOAT4(0.6f, 0, 0, 1);
+					// Set active target for drawing, all array based D3D11 functions should use a syntax similar to below
+					ID3D11RenderTargetView* const targets[] = { myRenderTargetView };
+					myImmContext->OMSetRenderTargets(1, targets, myDepthStencilView);
+					myImmContext->RSSetViewports(1, &mainScreen);
+
+					// Clear screen to purple
+					const float purple[] = { .5f, .05f, .5f, 1 };
+					//myImmContext->ClearRenderTargetView(myRenderTargetView, purple);
+
+					// TODO: Set your shaders, Update & Set your constant buffers, Attatch your vertex & index buffers, Set your InputLayout & Topology & Draw!
+					XMMATRIX worldMatrix;// , viewMatrix, projectionMatrix;
 
 
-				#pragma region Mesh12
-				myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView12);
-				// Set the vertex buffer to active in the input assembler so it can be rendered.
-				myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer12, &stride, &offset);
+	#pragma region MODEL RENDER
+	// TODO: Set your shaders, Update & Set your constant buffers, Attatch your vertex & index buffers, Set your InputLayout & Topology & Draw!
+					unsigned int stride;
+					unsigned int offset;
 
-				// Set the index buffer to active in the input assembler so it can be rendered.
-				myImmContext->IASetIndexBuffer(m_indexBuffer12, DXGI_FORMAT_R32_UINT, 0);
+	#if MESHLIGHT
+					// Set vertex buffer stride and offset.
+					stride = sizeof(_OBJ_VERT_);
+					offset = 0;
 
-				// Set the type of primitive that should be rendered from this vertex buffer, in this case triangles.
-				myImmContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-				//Individual Object worldMatrix
-				worldMatrix = XMMatrixMultiply(XMMatrixTranslation(0.0f, 0.0f, 0.0f), XMMatrixScaling(30, 10, 30));
-				//INDEXCOUNT, INDEXOFFSET
-				m_ShaderInv->Render(myImmContext, m_indexCount12, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+
+	#endif // TEXTURE
 
 
 	#pragma endregion
 
-				#pragma region Skybox2
-				m_ShaderInv->skyBox = true;
-				myImmContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-				myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceViewSky2);
-				// Set the vertex buffer to active in the input assembler so it can be rendered.
-				myImmContext->IASetVertexBuffers(0, 1, &m_vertexBufferSky, &stride, &offset);
+					myImmContext->IASetIndexBuffer(m_indexBufferMap, DXGI_FORMAT_R32_UINT, 0);
+					myImmContext->IASetVertexBuffers(0, 1, &m_vertexBufferSky, &stride, &offset);
 
-				// Set the index buffer to active in the input assembler so it can be rendered.
-				myImmContext->IASetIndexBuffer(m_indexBufferSky, DXGI_FORMAT_R32_UINT, 0);
+					// Just set the WVP to a scale and translate, which will put the square into the bottom right corner of the screen
+					worldMatrix = XMMatrixScaling(0.35f, 0.35f, 0.0f) * XMMatrixTranslation(0.40f, -0.65f, 0.0f);
+					myImmContext->PSSetShaderResources(0, 1, &shaderResourceViewMap);    // Draw the map to the square
 
-				// Set the index buffer to active in the input assembler so it can be rendered.
-				worldMatrix = XMMatrixMultiply(XMMatrixScaling(800.0f, 800.0f, 800.0f), XMMatrixTranslation((float)(m_Camera->m_positionX + 2500), (float)(m_Camera->m_positionY + 9), (float)(m_Camera->m_positionZ - 760)));
-				m_ShaderInv->Render(myImmContext, m_indexCountSky, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
-				m_ShaderInv->skyBox = false;
-
-#pragma endregion
-
-				#pragma region Mesh13
-				myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView13);
-				// Set the vertex buffer to active in the input assembler so it can be rendered.
-				myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer13, &stride, &offset);
-
-				// Set the index buffer to active in the input assembler so it can be rendered.
-				myImmContext->IASetIndexBuffer(m_indexBuffer13, DXGI_FORMAT_R32_UINT, 0);
-
-				// Set the type of primitive that should be rendered from this vertex buffer, in this case triangles.
-				myImmContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-				//Individual Object worldMatrix
-				worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation - 15, 2.0f, 2.5f), XMMatrixScaling(5, 5, 5));
-				//INDEXCOUNT, INDEXOFFSET
-				m_ShaderInv->Render(myImmContext, m_indexCount13, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
-				worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation + 55, 2.0f, 2.5f), XMMatrixScaling(5, 5, 5));
-				m_ShaderInv->Render(myImmContext, m_indexCount13, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
-				worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation, 2.0f, 2.5f), XMMatrixScaling(5, 5, 5));
-				//INDEXCOUNT, INDEXOFFSET
-				m_ShaderInv->Render(myImmContext, m_indexCount13, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
-				worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation, 2.0f, 115.5f), XMMatrixScaling(5, 5, 5));
-				//INDEXCOUNT, INDEXOFFSET
-				m_ShaderInv->Render(myImmContext, m_indexCount13, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
-				worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation + 55, 2.0f, 115.5f), XMMatrixScaling(5, 5, 5));
-				//INDEXCOUNT, INDEXOFFSET
-				m_ShaderInv->Render(myImmContext, m_indexCount13, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
-				worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation - 15, 2.0f, 115.5f), XMMatrixScaling(5, 5, 5));
-				//INDEXCOUNT, INDEXOFFSET
-				m_ShaderInv->Render(myImmContext, m_indexCount13, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
-				worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation + 55, 10.0f, 475 ), XMMatrixRotationRollPitchYaw(0, 1.57, 0));
-				worldMatrix = XMMatrixMultiply(XMMatrixScaling(5, 5, 5), worldMatrix);
-				//INDEXCOUNT, INDEXOFFSET
-				m_ShaderInv->Render(myImmContext, m_indexCount13, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
-				worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation, 10.0f, 475), XMMatrixRotationRollPitchYaw(0, 1.57, 0));
-				worldMatrix = XMMatrixMultiply(XMMatrixScaling(5, 5, 5), worldMatrix);
-				//INDEXCOUNT, INDEXOFFSET
-				m_ShaderInv->Render(myImmContext, m_indexCount13, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
-				worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation - 55, 10.0f, 475), XMMatrixRotationRollPitchYaw(0, 1.57, 0));
-				worldMatrix = XMMatrixMultiply(XMMatrixScaling(5, 5, 5), worldMatrix);
-				//INDEXCOUNT, INDEXOFFSET
-				m_ShaderInv->Render(myImmContext, m_indexCount13, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
-
-#pragma endregion
-
-			}
-			if (G_SUCCESS(mySurface->GetRenderTarget((void**)&myRenderTargetView)))
-			{
-				// Grab the Z Buffer if one was requested
-				if (G_SUCCESS(mySurface->GetDepthStencilView((void**)&myDepthStencilView)))
-				{
-					myImmContext->ClearDepthStencilView(myDepthStencilView, D3D11_CLEAR_DEPTH, 1, 0); // clear it to Z exponential Far.
-					myDepthStencilView->Release();
+					myImmContext->RSSetState(CWcullMode);
+					//Draw the second cube
+					m_ShaderInv->Render(myImmContext, 6, 0, 0, worldMatrix, XMMatrixIdentity(), XMMatrixIdentity(), m_lightDir, m_diffuseColor);
 				}
-
-				// Set active target for drawing, all array based D3D11 functions should use a syntax similar to below
-				ID3D11RenderTargetView* const targets[] = { myRenderTargetView };
-				myImmContext->OMSetRenderTargets(1, targets, myDepthStencilView);
-				myImmContext->RSSetViewports(1, &mainScreen);
-
-				// Clear screen to purple
-				const float purple[] = { .5f, .05f, .5f, 1 };
-				//myImmContext->ClearRenderTargetView(myRenderTargetView, purple);
-
-				// TODO: Set your shaders, Update & Set your constant buffers, Attatch your vertex & index buffers, Set your InputLayout & Topology & Draw!
-				XMMATRIX worldMatrix;// , viewMatrix, projectionMatrix;
-
-
-				#pragma region MODEL RENDER
-									 // TODO: Set your shaders, Update & Set your constant buffers, Attatch your vertex & index buffers, Set your InputLayout & Topology & Draw!
-				unsigned int stride;
-				unsigned int offset;
-
-#if MESHLIGHT
-				// Set vertex buffer stride and offset.
-				stride = sizeof(_OBJ_VERT_);
-				offset = 0;
-
-
-#endif // TEXTURE
-
-
-#pragma endregion
-
-
-				myImmContext->IASetIndexBuffer(m_indexBufferMap, DXGI_FORMAT_R32_UINT, 0);
-				myImmContext->IASetVertexBuffers(0, 1, &m_vertexBufferSky, &stride, &offset);
-
-				// Just set the WVP to a scale and translate, which will put the square into the bottom right corner of the screen
-				worldMatrix = XMMatrixScaling(0.35f, 0.35f, 0.0f) * XMMatrixTranslation(0.40f, -0.65f, 0.0f);
-				myImmContext->PSSetShaderResources(0, 1, &shaderResourceViewMap);   
-				// Draw the map to the square
-				myImmContext->RSSetState(CWcullMode);
-				//Draw the map
-				m_ShaderInv->Render(myImmContext, 6, 0, 0, worldMatrix, XMMatrixIdentity(), XMMatrixIdentity(), m_lightDir, m_diffuseColor);
-			}
-			if (G_SUCCESS(mySurface->GetRenderTarget((void**)&renderTargetViewMap)))
-			{
-				// Grab the Z Buffer if one was requested
-				if (G_SUCCESS(mySurface->GetDepthStencilView((void**)&myDepthStencilView)))
+				if (G_SUCCESS(mySurface->GetRenderTarget((void**)&renderTargetViewMap)))
 				{
-					myImmContext->ClearDepthStencilView(myDepthStencilView, D3D11_CLEAR_DEPTH, 1, 0); // clear it to Z exponential Far.
-					myDepthStencilView->Release();
+					// Grab the Z Buffer if one was requested
+					if (G_SUCCESS(mySurface->GetDepthStencilView((void**)&myDepthStencilView)))
+					{
+						myImmContext->ClearDepthStencilView(myDepthStencilView, D3D11_CLEAR_DEPTH, 1, 0); // clear it to Z exponential Far.
+						myDepthStencilView->Release();
+					}
+
+					// Set our maps Render Target
+					myImmContext->OMSetRenderTargets(1, &renderTargetViewMap, myDepthStencilView);
+					myImmContext->RSSetViewports(1, &miniMap);
+					// Clear screen to purple
+					const float purple[] = { .5f, .05f, .5f, 1 };
+					//myImmContext->ClearRenderTargetView(renderTargetViewMap, purple);
+
+					// TODO: Set your shaders, Update & Set your constant buffers, Attatch your vertex & index buffers, Set your InputLayout & Topology & Draw!
+					XMMATRIX worldMatrix;// viewMatrix, projectionMatrix;
+
+					//Render Camera
+					//m_Camera->Render();
+
+	#pragma region MODEL RENDER
+	// TODO: Set your shaders, Update & Set your constant buffers, Attatch your vertex & index buffers, Set your InputLayout & Topology & Draw!
+					unsigned int stride;
+					unsigned int offset;
+
+	#if MESHLIGHT
+					// Set vertex buffer stride and offset.
+					stride = sizeof(_OBJ_VERT_);
+					offset = 0;
+
+
+	#endif // TEXTURE
+
+
+	#pragma endregion
+
+					//Set up matrices
+					worldMatrix = DirectX::XMMatrixIdentity();
+					m_Camera->GetViewMatrix(mapView);
+
+					m_lightDir = XMFLOAT3(translation, 0, 50);
+					m_diffuseColor = XMFLOAT4(0, 0, .6f, 1);
+					XMMATRIX mapProjection = XMMatrixOrthographicLH(256, 256, nearPlane, farPlane);
+
+	#pragma region Mesh1
+					myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView1);
+					// Set the vertex buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer1, &stride, &offset);
+
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetIndexBuffer(m_indexBuffer1, DXGI_FORMAT_R32_UINT, 0);
+
+					// Set the type of primitive that should be rendered from this vertex buffer, in this case triangles.
+					myImmContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+					//Individual Object worldMatrix
+					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(3.0f, -05.0f, -0.0f), XMMatrixRotationRollPitchYaw(90, 0, 0));
+					//INDEXCOUNT, INDEXOFFSET
+					m_ShaderInv->Render(myImmContext, m_vertexCount1, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
+	#pragma endregion
+
+	#pragma region Mesh2
+					//m_ShaderInv->UVScrolling = true;
+					//myContext->PSSetShaderResources(0, 1, &m_shaderResourceView2);
+					//// Set the vertex buffer to active in the input assembler so it can be rendered.
+					//myContext->IASetVertexBuffers(0, 1, &m_vertexBuffer2, &stride, &offset);
+
+					//// Set the index buffer to active in the input assembler so it can be rendered.
+					//myContext->IASetIndexBuffer(m_indexBuffer2, DXGI_FORMAT_R32_UINT, 0);
+
+					//// Set the index buffer to active in the input assembler so it can be rendered.
+					//worldMatrix = XMMatrixMultiply(XMMatrixScaling(5, 5, 5), XMMatrixTranslation(m_lightDir.x, m_lightDir.y, m_lightDir.z));
+					//m_ShaderInv->Render(myContext, m_indexCount2, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+
+					//m_ShaderInv->UVScrolling = true;
+					//myContext->PSSetShaderResources(0, 1, &m_shaderResourceView2);
+					//// Set the vertex buffer to active in the input assembler so it can be rendered.
+					//myContext->IASetVertexBuffers(0, 1, &m_vertexBuffer2, &stride, &offset);
+
+					//// Set the index buffer to active in the input assembler so it can be rendered.
+					//myContext->IASetIndexBuffer(m_indexBuffer2, DXGI_FORMAT_R32_UINT, 0);
+
+					//// Set the index buffer to active in the input assembler so it can be rendered.
+					//worldMatrix = XMMatrixMultiply(XMMatrixScaling(45, 45, 45), XMMatrixTranslation(140 + translation, 25, 60));
+					//m_ShaderInv->Render(myContext, m_indexCount2, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+
+	#pragma endregion
+
+	#pragma region Mesh3
+					unsigned int strides[2];
+					unsigned int offsets[2];
+					ID3D11Buffer* bufferPointers[2];
+					m_ShaderInv->instanceRendering = true;
+					// Set the buffer strides.
+					strides[0] = sizeof(_OBJ_VERT_);
+					strides[1] = sizeof(InstanceType);
+
+					// Set the buffer offsets.
+					offsets[0] = 0;
+					offsets[1] = 0;
+					// Set the array of pointers to the vertex and instance buffers.
+					bufferPointers[0] = m_vertexBuffer3;
+					bufferPointers[1] = m_instanceBuffer;
+					m_ShaderInv->UVScrolling = false;
+					m_ShaderInv->instanceRendering = true;
+
+					//Grass
+					myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView3);
+					// Set the vertex buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetVertexBuffers(0, 2, bufferPointers, strides, offsets);
+
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetIndexBuffer(m_indexBuffer3, DXGI_FORMAT_R32_UINT, 0);
+					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(0, 4.0f, 10), XMMatrixScaling(1.0f, 1.0f, 1.0f));
+					m_ShaderInv->Render(myImmContext, m_indexCount3, 0, m_instanceCount, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
+					m_ShaderInv->instanceRendering = false;
+	#pragma endregion
+
+	#pragma region Mesh4
+	#if 0
+					myContext->PSSetShaderResources(0, 1, &m_shaderResourceView4);
+					//			 Set the vertex buffer to active in the input assembler so it can be rendered.
+					myContext->IASetVertexBuffers(0, 1, &m_vertexBuffer4, &stride, &offset);
+
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					myContext->IASetIndexBuffer(m_indexBuffer4, DXGI_FORMAT_R32_UINT, 0);
+
+					// Set the type of primitive that should be rendered from this vertex buffer, in this case triangles.
+					myContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
+
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					worldMatrix = XMMatrixMultiply(XMMatrixScaling(45, 45, 45), XMMatrixTranslation(-translation, 4, 60));
+					m_ShaderInv->Render(myContext, m_indexCount4, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+
+	#endif // 0
+
+	#pragma endregion
+
+	#pragma region Mesh5
+					m_ShaderInv->sinRendering = true;
+					myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView5);
+					// Set the vertex buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer5, &stride, &offset);
+
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetIndexBuffer(m_indexBuffer5, DXGI_FORMAT_R32_UINT, 0);
+
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					worldMatrix = XMMatrixMultiply(XMMatrixScaling(3, 3, 3), XMMatrixTranslation(0, 8, 140));
+					m_ShaderInv->Render(myImmContext, m_indexCount5, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
+					m_ShaderInv->sinRendering = false;
+
+	#pragma endregion
+
+	#pragma region Mesh6
+					myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView6);
+					// Set the vertex buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer6, &stride, &offset);
+
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetIndexBuffer(m_indexBuffer6, DXGI_FORMAT_R32_UINT, 0);
+
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					worldMatrix = XMMatrixMultiply(XMMatrixScaling(6, 6, 6), XMMatrixTranslation(-100, 5, 170));
+					worldMatrix = XMMatrixMultiply(XMMatrixRotationRollPitchYaw(0, 3.14159265f, 0), worldMatrix);
+
+					m_ShaderInv->Render(myImmContext, m_indexCount6, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
+
+	#pragma endregion
+
+	#pragma region Mesh7
+					myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView7);
+					// Set the vertex buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer7, &stride, &offset);
+
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetIndexBuffer(m_indexBuffer7, DXGI_FORMAT_R32_UINT, 0);
+
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					worldMatrix = XMMatrixMultiply(XMMatrixScaling(.1f, .1f, .1f), XMMatrixTranslation(-10, 4, 50));
+					m_ShaderInv->Render(myImmContext, m_indexCount7, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
+
+	#pragma endregion
+
+	#pragma region Mesh8
+					myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView8);
+					// Set the vertex buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer8, &stride, &offset);
+
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetIndexBuffer(m_indexBuffer8, DXGI_FORMAT_R32_UINT, 0);
+
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					worldMatrix = XMMatrixMultiply(XMMatrixRotationRollPitchYaw(55, 3.14159265f, 0), XMMatrixTranslation(-100, -3, 160));
+					worldMatrix = XMMatrixMultiply(XMMatrixScaling(.3f, .3f, .3f), worldMatrix);
+					m_ShaderInv->Render(myImmContext, m_indexCount8, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
+
+	#pragma endregion
+
+	#pragma region Mesh9
+					myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView9);
+					// Set the vertex buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer9, &stride, &offset);
+
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetIndexBuffer(m_indexBuffer9, DXGI_FORMAT_R32_UINT, 0);
+
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					worldMatrix = XMMatrixMultiply(XMMatrixScaling(80, 200, 120), XMMatrixTranslation(25, -60, -180));
+					worldMatrix = XMMatrixMultiply(XMMatrixRotationRollPitchYaw(0, .5, 0), worldMatrix);
+					m_ShaderInv->Render(myImmContext, m_indexCount9, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
+
+	#pragma endregion
+
+	#pragma region Mesh10
+					myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView10);
+					// Set the vertex buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer10, &stride, &offset);
+
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetIndexBuffer(m_indexBuffer10, DXGI_FORMAT_R32_UINT, 0);
+
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					worldMatrix = XMMatrixMultiply(XMMatrixScaling(1, 1, 1), XMMatrixTranslation(5, -45, 0));
+					worldMatrix = XMMatrixMultiply(XMMatrixRotationRollPitchYaw(0, .5, 0), worldMatrix);
+					m_ShaderInv->Render(myImmContext, m_indexCount10, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
+
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					worldMatrix = XMMatrixMultiply(XMMatrixScaling(1, 1, 1), XMMatrixTranslation(5, -25, 240));
+					worldMatrix = XMMatrixMultiply(XMMatrixRotationRollPitchYaw(0, .5, 0), worldMatrix);
+					m_ShaderInv->Render(myImmContext, m_indexCount10, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
+
+	#pragma endregion
+
+	#pragma region Mesh11
+					myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView11);
+					// Set the vertex buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer11, &stride, &offset);
+
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetIndexBuffer(m_indexBuffer11, DXGI_FORMAT_R32_UINT, 0);
+
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					worldMatrix = XMMatrixMultiply(XMMatrixScaling(.05f, .05f, .05f), XMMatrixTranslation(-10, 5, 60));
+					worldMatrix = XMMatrixMultiply(XMMatrixRotationRollPitchYaw(0, 3.14159265f, 0), worldMatrix);
+					m_ShaderInv->Render(myImmContext, m_indexCount11, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
+
+	#pragma endregion
+				}			
+				break;
+			}
+			case RoadToVictory:
+			{							
+				if (G_SUCCESS(mySurface->GetRenderTarget((void**)&myRenderTargetView)))
+				{
+					// Grab the Z Buffer if one was requested
+					if (G_SUCCESS(mySurface->GetDepthStencilView((void**)&myDepthStencilView)))
+					{
+						myImmContext->ClearDepthStencilView(myDepthStencilView, D3D11_CLEAR_DEPTH, 1, 0); // clear it to Z exponential Far.
+						myDepthStencilView->Release();
+					}
+
+					// Set active target for drawing, all array based D3D11 functions should use a syntax similar to below
+					ID3D11RenderTargetView* const targets[] = { myRenderTargetView };
+					myImmContext->OMSetRenderTargets(1, targets, myDepthStencilView);
+					myImmContext->RSSetViewports(1, &mainScreen);
+
+					// Clear screen to purple
+					const float purple[] = { .5f, .05f, .5f, 1 };
+					myImmContext->ClearRenderTargetView(myRenderTargetView, purple);
+
+					// TODO: Set your shaders, Update & Set your constant buffers, Attatch your vertex & index buffers, Set your InputLayout & Topology & Draw!
+					XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
+
+					//Render Camera
+					m_Camera->Render();
+
+					#pragma region MODEL RENDER
+					// TODO: Set your shaders, Update & Set your constant buffers, Attatch your vertex & index buffers, Set your InputLayout & Topology & Draw!
+					unsigned int stride;
+					unsigned int offset;
+
+		#if MESHLIGHT
+					// Set vertex buffer stride and offset.
+					stride = sizeof(_OBJ_VERT_);
+					offset = 0;
+		#endif
+
+		#pragma endregion
+
+					//Set up matrices
+					worldMatrix = DirectX::XMMatrixIdentity();
+					m_Camera->GetViewMatrix(viewMatrix);
+
+					if (height && width)
+					{
+						if (width >= height)
+						{
+							projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(3.14f / zoomFOV, (float)(width / height), nearPlane, farPlane);
+						}
+						else
+							projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(3.14f / zoomFOV, (float)(height / width), nearPlane, farPlane);
+					}
+
+					m_lightDir = XMFLOAT3(translation, 0, 50);
+					m_diffuseColor = XMFLOAT4(0.6f, 0, 0, 1);
+
+
+					#pragma region Mesh12
+					myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView12);
+					// Set the vertex buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer12, &stride, &offset);
+
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetIndexBuffer(m_indexBuffer12, DXGI_FORMAT_R32_UINT, 0);
+
+					// Set the type of primitive that should be rendered from this vertex buffer, in this case triangles.
+					myImmContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+					//Individual Object worldMatrix
+					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(0.0f, 0.0f, 0.0f), XMMatrixScaling(30, 10, 30));
+					//INDEXCOUNT, INDEXOFFSET
+					m_ShaderInv->Render(myImmContext, m_indexCount12, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+
+
+		#pragma endregion
+
+					#pragma region Skybox2
+					m_ShaderInv->skyBox = true;
+					myImmContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+					myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceViewSky2);
+					// Set the vertex buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetVertexBuffers(0, 1, &m_vertexBufferSky, &stride, &offset);
+
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetIndexBuffer(m_indexBufferSky, DXGI_FORMAT_R32_UINT, 0);
+
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					worldMatrix = XMMatrixMultiply(XMMatrixScaling(800.0f, 800.0f, 800.0f), XMMatrixTranslation((float)(m_Camera->m_positionX + 2500), (float)(m_Camera->m_positionY + 9), (float)(m_Camera->m_positionZ - 760)));
+					m_ShaderInv->Render(myImmContext, m_indexCountSky, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+					m_ShaderInv->skyBox = false;
+
+	#pragma endregion
+
+					#pragma region Mesh13
+					myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView13);
+					// Set the vertex buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer13, &stride, &offset);
+
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetIndexBuffer(m_indexBuffer13, DXGI_FORMAT_R32_UINT, 0);
+
+					// Set the type of primitive that should be rendered from this vertex buffer, in this case triangles.
+					myImmContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+					//Individual Object worldMatrix
+					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation - 15, 2.0f, 2.5f), XMMatrixScaling(5, 5, 5));
+					//INDEXCOUNT, INDEXOFFSET
+					m_ShaderInv->Render(myImmContext, m_indexCount13, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation + 55, 2.0f, 2.5f), XMMatrixScaling(5, 5, 5));
+					m_ShaderInv->Render(myImmContext, m_indexCount13, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation, 2.0f, 2.5f), XMMatrixScaling(5, 5, 5));
+					//INDEXCOUNT, INDEXOFFSET
+					m_ShaderInv->Render(myImmContext, m_indexCount13, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation, 2.0f, 115.5f), XMMatrixScaling(5, 5, 5));
+					//INDEXCOUNT, INDEXOFFSET
+					m_ShaderInv->Render(myImmContext, m_indexCount13, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation + 55, 2.0f, 115.5f), XMMatrixScaling(5, 5, 5));
+					//INDEXCOUNT, INDEXOFFSET
+					m_ShaderInv->Render(myImmContext, m_indexCount13, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation - 15, 2.0f, 115.5f), XMMatrixScaling(5, 5, 5));
+					//INDEXCOUNT, INDEXOFFSET
+					m_ShaderInv->Render(myImmContext, m_indexCount13, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation + 55, 10.0f, 475 ), XMMatrixRotationRollPitchYaw(0, 1.57, 0));
+					worldMatrix = XMMatrixMultiply(XMMatrixScaling(5, 5, 5), worldMatrix);
+					//INDEXCOUNT, INDEXOFFSET
+					m_ShaderInv->Render(myImmContext, m_indexCount13, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation, 10.0f, 475), XMMatrixRotationRollPitchYaw(0, 1.57, 0));
+					worldMatrix = XMMatrixMultiply(XMMatrixScaling(5, 5, 5), worldMatrix);
+					//INDEXCOUNT, INDEXOFFSET
+					m_ShaderInv->Render(myImmContext, m_indexCount13, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation - 55, 10.0f, 475), XMMatrixRotationRollPitchYaw(0, 1.57, 0));
+					worldMatrix = XMMatrixMultiply(XMMatrixScaling(5, 5, 5), worldMatrix);
+					//INDEXCOUNT, INDEXOFFSET
+					m_ShaderInv->Render(myImmContext, m_indexCount13, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+
+	#pragma endregion
+
 				}
+				if (G_SUCCESS(mySurface->GetRenderTarget((void**)&myRenderTargetView)))
+				{
+					// Grab the Z Buffer if one was requested
+					if (G_SUCCESS(mySurface->GetDepthStencilView((void**)&myDepthStencilView)))
+					{
+						myImmContext->ClearDepthStencilView(myDepthStencilView, D3D11_CLEAR_DEPTH, 1, 0); // clear it to Z exponential Far.
+						myDepthStencilView->Release();
+					}
 
-				// Set our maps Render Target
-				myImmContext->OMSetRenderTargets(1, &renderTargetViewMap, myDepthStencilView);
-				myImmContext->RSSetViewports(1, &miniMap);
+					// Set active target for drawing, all array based D3D11 functions should use a syntax similar to below
+					ID3D11RenderTargetView* const targets[] = { myRenderTargetView };
+					myImmContext->OMSetRenderTargets(1, targets, myDepthStencilView);
+					myImmContext->RSSetViewports(1, &mainScreen);
 
-				// Clear screen to purple
-				const float purple[] = { .5f, .05f, .5f, 1 };
-				//myImmContext->ClearRenderTargetView(renderTargetViewMap, purple);
+					// Clear screen to purple
+					const float purple[] = { .5f, .05f, .5f, 1 };
+					//myImmContext->ClearRenderTargetView(myRenderTargetView, purple);
 
-				// TODO: Set your shaders, Update & Set your constant buffers, Attatch your vertex & index buffers, Set your InputLayout & Topology & Draw!
-				XMMATRIX worldMatrix;// viewMatrix, projectionMatrix;
-
-
-				#pragma region MODEL RENDER
-									 // TODO: Set your shaders, Update & Set your constant buffers, Attatch your vertex & index buffers, Set your InputLayout & Topology & Draw!
-				unsigned int stride;
-				unsigned int offset;
-
-#if MESHLIGHT
-				// Set vertex buffer stride and offset.
-				stride = sizeof(_OBJ_VERT_);
-				offset = 0;
+					// TODO: Set your shaders, Update & Set your constant buffers, Attatch your vertex & index buffers, Set your InputLayout & Topology & Draw!
+					XMMATRIX worldMatrix;// , viewMatrix, projectionMatrix;
 
 
-#endif // TEXTURE
+					#pragma region MODEL RENDER
+											// TODO: Set your shaders, Update & Set your constant buffers, Attatch your vertex & index buffers, Set your InputLayout & Topology & Draw!
+					unsigned int stride;
+					unsigned int offset;
+
+	#if MESHLIGHT
+					// Set vertex buffer stride and offset.
+					stride = sizeof(_OBJ_VERT_);
+					offset = 0;
 
 
-#pragma endregion
+	#endif // TEXTURE
 
-				//Set up matrices
-				worldMatrix = DirectX::XMMatrixIdentity();
-				//m_Camera->GetViewMatrix(mapView);
 
-				m_lightDir = XMFLOAT3(translation, 0, 50);
-				m_diffuseColor = XMFLOAT4(0, 0, .6f, 1);
-				XMMATRIX mapProjection = XMMatrixOrthographicLH(256, 256, nearPlane, farPlane);
+	#pragma endregion
+
+
+					myImmContext->IASetIndexBuffer(m_indexBufferMap, DXGI_FORMAT_R32_UINT, 0);
+					myImmContext->IASetVertexBuffers(0, 1, &m_vertexBufferSky, &stride, &offset);
+
+					// Just set the WVP to a scale and translate, which will put the square into the bottom right corner of the screen
+					worldMatrix = XMMatrixScaling(0.35f, 0.35f, 0.0f) * XMMatrixTranslation(0.40f, -0.65f, 0.0f);
+					myImmContext->PSSetShaderResources(0, 1, &shaderResourceViewMap);   
+					// Draw the map to the square
+					myImmContext->RSSetState(CWcullMode);
+					//Draw the map
+					m_ShaderInv->Render(myImmContext, 6, 0, 0, worldMatrix, XMMatrixIdentity(), XMMatrixIdentity(), m_lightDir, m_diffuseColor);
+				}
+				if (G_SUCCESS(mySurface->GetRenderTarget((void**)&renderTargetViewMap)))
+				{
+					// Grab the Z Buffer if one was requested
+					if (G_SUCCESS(mySurface->GetDepthStencilView((void**)&myDepthStencilView)))
+					{
+						myImmContext->ClearDepthStencilView(myDepthStencilView, D3D11_CLEAR_DEPTH, 1, 0); // clear it to Z exponential Far.
+						myDepthStencilView->Release();
+					}
+
+					// Set our maps Render Target
+					myImmContext->OMSetRenderTargets(1, &renderTargetViewMap, myDepthStencilView);
+					myImmContext->RSSetViewports(1, &miniMap);
+
+					// Clear screen to purple
+					const float purple[] = { .5f, .05f, .5f, 1 };
+					//myImmContext->ClearRenderTargetView(renderTargetViewMap, purple);
+
+					// TODO: Set your shaders, Update & Set your constant buffers, Attatch your vertex & index buffers, Set your InputLayout & Topology & Draw!
+					XMMATRIX worldMatrix;// viewMatrix, projectionMatrix;
+
+
+					#pragma region MODEL RENDER
+											// TODO: Set your shaders, Update & Set your constant buffers, Attatch your vertex & index buffers, Set your InputLayout & Topology & Draw!
+					unsigned int stride;
+					unsigned int offset;
+
+	#if MESHLIGHT
+					// Set vertex buffer stride and offset.
+					stride = sizeof(_OBJ_VERT_);
+					offset = 0;
+
+
+	#endif // TEXTURE
+
+
+	#pragma endregion
+
+					//Set up matrices
+					worldMatrix = DirectX::XMMatrixIdentity();
+					m_Camera->GetViewMatrix(mapView);
+
+					m_lightDir = XMFLOAT3(translation, 0, 50);
+					m_diffuseColor = XMFLOAT4(0, 0, .6f, 1);
+					XMMATRIX mapProjection = XMMatrixOrthographicLH(256, 256, nearPlane, farPlane);
 				
-				#pragma region Mesh12
-				myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView12);
-				// Set the vertex buffer to active in the input assembler so it can be rendered.
-				myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer12, &stride, &offset);
+					#pragma region Mesh12
+					myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView12);
+					// Set the vertex buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer12, &stride, &offset);
 
-				// Set the index buffer to active in the input assembler so it can be rendered.
-				myImmContext->IASetIndexBuffer(m_indexBuffer12, DXGI_FORMAT_R32_UINT, 0);
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetIndexBuffer(m_indexBuffer12, DXGI_FORMAT_R32_UINT, 0);
 
-				// Set the type of primitive that should be rendered from this vertex buffer, in this case triangles.
-				myImmContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-				//Individual Object worldMatrix
-				worldMatrix = XMMatrixMultiply(XMMatrixTranslation(0.0f, 0.0f, 0.0f), XMMatrixScaling(10, 10, 10));
-				//INDEXCOUNT, INDEXOFFSET
-				m_ShaderInv->Render(myImmContext, m_indexCount12, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
+					// Set the type of primitive that should be rendered from this vertex buffer, in this case triangles.
+					myImmContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+					//Individual Object worldMatrix
+					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(0.0f, 0.0f, 0.0f), XMMatrixScaling(20, 20, 20));
+					//INDEXCOUNT, INDEXOFFSET
+					m_ShaderInv->Render(myImmContext, m_indexCount12, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
+
+
+	#pragma endregion
+					#pragma region Mesh13
+					myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView13);
+					// Set the vertex buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer13, &stride, &offset);
+
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetIndexBuffer(m_indexBuffer13, DXGI_FORMAT_R32_UINT, 0);
+
+					// Set the type of primitive that should be rendered from this vertex buffer, in this case triangles.
+					myImmContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+					//Individual Object worldMatrix
+					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation - 15, 2.0f, 2.5f), XMMatrixScaling(5, 5, 5));
+					//INDEXCOUNT, INDEXOFFSET
+					m_ShaderInv->Render(myImmContext, m_indexCount13, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
+					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation + 55, 2.0f, 2.5f), XMMatrixScaling(5, 5, 5));
+					m_ShaderInv->Render(myImmContext, m_indexCount13, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
+					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation, 2.0f, 2.5f), XMMatrixScaling(5, 5, 5));
+					//INDEXCOUNT, INDEXOFFSET
+					m_ShaderInv->Render(myImmContext, m_indexCount13, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
+					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation, 2.0f, 115.5f), XMMatrixScaling(5, 5, 5));
+					//INDEXCOUNT, INDEXOFFSET
+					m_ShaderInv->Render(myImmContext, m_indexCount13, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
+					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation + 55, 2.0f, 115.5f), XMMatrixScaling(5, 5, 5));
+					//INDEXCOUNT, INDEXOFFSET
+					m_ShaderInv->Render(myImmContext, m_indexCount13, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
+					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation - 15, 2.0f, 115.5f), XMMatrixScaling(5, 5, 5));
+					//INDEXCOUNT, INDEXOFFSET
+					m_ShaderInv->Render(myImmContext, m_indexCount13, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
+					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation + 55, 10.0f, 475), XMMatrixRotationRollPitchYaw(0, 1.57, 0));
+					worldMatrix = XMMatrixMultiply(XMMatrixScaling(5, 5, 5), worldMatrix);
+					//INDEXCOUNT, INDEXOFFSET
+					m_ShaderInv->Render(myImmContext, m_indexCount13, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
+					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation, 10.0f, 475), XMMatrixRotationRollPitchYaw(0, 1.57, 0));
+					worldMatrix = XMMatrixMultiply(XMMatrixScaling(5, 5, 5), worldMatrix);
+					//INDEXCOUNT, INDEXOFFSET
+					m_ShaderInv->Render(myImmContext, m_indexCount13, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
+					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation - 55, 10.0f, 475), XMMatrixRotationRollPitchYaw(0, 1.57, 0));
+					worldMatrix = XMMatrixMultiply(XMMatrixScaling(5, 5, 5), worldMatrix);
+					//INDEXCOUNT, INDEXOFFSET
+					m_ShaderInv->Render(myImmContext, m_indexCount13, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
+
+	#pragma endregion
+			}			
+				break;
+			}
+			case Space:
+			{
+				if (G_SUCCESS(mySurface->GetRenderTarget((void**)&myRenderTargetView)))
+				{
+					// Grab the Z Buffer if one was requested
+					if (G_SUCCESS(mySurface->GetDepthStencilView((void**)&myDepthStencilView)))
+					{
+						myImmContext->ClearDepthStencilView(myDepthStencilView, D3D11_CLEAR_DEPTH, 1, 0); // clear it to Z exponential Far.
+						myDepthStencilView->Release();
+					}
+
+					// Set active target for drawing, all array based D3D11 functions should use a syntax similar to below
+					ID3D11RenderTargetView* const targets[] = { myRenderTargetView };
+					myImmContext->OMSetRenderTargets(1, targets, myDepthStencilView);
+					myImmContext->RSSetViewports(1, &mainScreen);
+
+					// Clear screen to purple
+					const float black[] = { 0, 0, 0, 1 };
+					myImmContext->ClearRenderTargetView(myRenderTargetView, black);
+
+					// TODO: Set your shaders, Update & Set your constant buffers, Attatch your vertex & index buffers, Set your InputLayout & Topology & Draw!
+					XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
+
+					//Render Camera
+					m_Camera->Render();
+
+					#pragma region MODEL RENDER
+					// TODO: Set your shaders, Update & Set your constant buffers, Attatch your vertex & index buffers, Set your InputLayout & Topology & Draw!
+					unsigned int stride;
+					unsigned int offset;
+
+#if MESHLIGHT
+					// Set vertex buffer stride and offset.
+					stride = sizeof(_OBJ_VERT_);
+					offset = 0;
+#endif
+
+#pragma endregion
+
+					//Set up matrices
+					worldMatrix = DirectX::XMMatrixIdentity();
+					m_Camera->GetViewMatrix(viewMatrix);
+
+					if (height && width)
+					{
+						if (width >= height)
+						{
+							projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(3.14f / zoomFOV, (float)(width / height), nearPlane, farPlane);
+						}
+						else
+							projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(3.14f / zoomFOV, (float)(height / width), nearPlane, farPlane);
+					}
+
+					m_lightDir = XMFLOAT3(0, 0, 0);
+					m_diffuseColor = XMFLOAT4(0.6f, 0, 0, 1);
+					XMMATRIX sunMatrix = XMMatrixMultiply(XMMatrixIdentity(), XMMatrixScaling(150, 150, 150));
+
+					#pragma region Mesh14
+					myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView14);
+					// Set the vertex buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer14, &stride, &offset);
+
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetIndexBuffer(m_indexBuffer14, DXGI_FORMAT_R32_UINT, 0);
+
+					// Set the type of primitive that should be rendered from this vertex buffer, in this case triangles.
+					myImmContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+					//Individual Object worldMatrix
+					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation - 15, 2.0f, 2.5f), XMMatrixScaling(20,  20, 20));
+					//INDEXCOUNT, INDEXOFFSET
+					m_ShaderInv->Render(myImmContext, m_indexCount14, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation + 55, 2.0f, 2.5f), XMMatrixScaling(20,  20, 20));
+					m_ShaderInv->Render(myImmContext, m_indexCount14, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation, 2.0f, 2.5f), XMMatrixScaling(20,  20, 20));
+					//INDEXCOUNT, INDEXOFFSET
+					m_ShaderInv->Render(myImmContext, m_indexCount14, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation, 2.0f, 115.5f), XMMatrixScaling(20,  20, 20));
+					//INDEXCOUNT, INDEXOFFSET
+					m_ShaderInv->Render(myImmContext, m_indexCount14, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation + 55, 2.0f, 115.5f), XMMatrixScaling(20,  20, 20));
+					//INDEXCOUNT, INDEXOFFSET
+					m_ShaderInv->Render(myImmContext, m_indexCount14, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation - 15, 2.0f, 115.5f), XMMatrixScaling(20,  20, 20));
+					//INDEXCOUNT, INDEXOFFSET
+					m_ShaderInv->Render(myImmContext, m_indexCount14, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation + 55, 10.0f, 475), XMMatrixRotationRollPitchYaw(0, 1.57, 0));
+					worldMatrix = XMMatrixMultiply(XMMatrixScaling(20,  20, 20), worldMatrix);
+					//INDEXCOUNT, INDEXOFFSET
+					m_ShaderInv->Render(myImmContext, m_indexCount14, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation, 10.0f, 475), XMMatrixRotationRollPitchYaw(0, 1.57, 0));
+					worldMatrix = XMMatrixMultiply(XMMatrixScaling(20,  20, 20), worldMatrix);
+					//INDEXCOUNT, INDEXOFFSET
+					m_ShaderInv->Render(myImmContext, m_indexCount14, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation - 55, 10.0f, 475), XMMatrixRotationRollPitchYaw(0, 1.57, 0));
+					worldMatrix = XMMatrixMultiply(XMMatrixScaling(20,  20, 20), worldMatrix);
+					//INDEXCOUNT, INDEXOFFSET
+					m_ShaderInv->Render(myImmContext, m_indexCount14, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+
+#pragma endregion
+
+					#pragma region Mesh15
+					// Set the vertex buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer15, &stride, &offset);
+
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetIndexBuffer(m_indexBuffer15, DXGI_FORMAT_R32_UINT, 0);
+
+					// Set the type of primitive that should be rendered from this vertex buffer, in this case triangles.
+					myImmContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+					//Sun
+					myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceViewSun);
+
+					//INDEXCOUNT, INDEXOFFSET
+					m_ShaderInv->Render(myImmContext, m_indexCount15, 0, 0, sunMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+
+					//Earth
+					myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView15);
+					//Individual Object worldMatrix
+					worldMatrix = XMMatrixMultiply(XMMatrixRotationRollPitchYaw(0, orbit, 0), sunMatrix);
+					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(10, 0, 0), worldMatrix);
+					//INDEXCOUNT, INDEXOFFSET
+					m_ShaderInv->Render(myImmContext, m_indexCount15, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+
+					//Mars
+					myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceViewMars);
+
+					worldMatrix = XMMatrixMultiply(XMMatrixRotationRollPitchYaw(0, orbit * .75f, 0), sunMatrix);
+					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(15, 0, 0), worldMatrix);
+
+					//INDEXCOUNT, INDEXOFFSET
+					m_ShaderInv->Render(myImmContext, m_indexCount15, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+
+					//Jupiter
+					myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceViewJupiter);
+
+					//Individual Object worldMatrix
+					worldMatrix = XMMatrixMultiply(XMMatrixRotationRollPitchYaw(0, orbit * .5f, 0), sunMatrix);
+					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(20, 0, 0), worldMatrix);
+
+					//INDEXCOUNT, INDEXOFFSET
+					m_ShaderInv->Render(myImmContext, m_indexCount15, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
+
+#pragma endregion
+				}
+				if (G_SUCCESS(mySurface->GetRenderTarget((void**)&myRenderTargetView)))
+				{
+					// Grab the Z Buffer if one was requested
+					if (G_SUCCESS(mySurface->GetDepthStencilView((void**)&myDepthStencilView)))
+					{
+						myImmContext->ClearDepthStencilView(myDepthStencilView, D3D11_CLEAR_DEPTH, 1, 0); // clear it to Z exponential Far.
+						myDepthStencilView->Release();
+					}
+
+					// Set active target for drawing, all array based D3D11 functions should use a syntax similar to below
+					ID3D11RenderTargetView* const targets[] = { myRenderTargetView };
+					myImmContext->OMSetRenderTargets(1, targets, myDepthStencilView);
+					myImmContext->RSSetViewports(1, &mainScreen);
+
+					// Clear screen to purple
+					const float purple[] = { .5f, .05f, .5f, 1 };
+					//myImmContext->ClearRenderTargetView(myRenderTargetView, purple);
+
+					// TODO: Set your shaders, Update & Set your constant buffers, Attatch your vertex & index buffers, Set your InputLayout & Topology & Draw!
+					XMMATRIX worldMatrix;// , viewMatrix, projectionMatrix;
+
+
+#pragma region MODEL RENDER
+										 // TODO: Set your shaders, Update & Set your constant buffers, Attatch your vertex & index buffers, Set your InputLayout & Topology & Draw!
+					unsigned int stride;
+					unsigned int offset;
+
+#if MESHLIGHT
+					// Set vertex buffer stride and offset.
+					stride = sizeof(_OBJ_VERT_);
+					offset = 0;
+
+
+#endif // TEXTURE
 
 
 #pragma endregion
-				#pragma region Mesh13
-				myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView13);
-				// Set the vertex buffer to active in the input assembler so it can be rendered.
-				myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer13, &stride, &offset);
 
-				// Set the index buffer to active in the input assembler so it can be rendered.
-				myImmContext->IASetIndexBuffer(m_indexBuffer13, DXGI_FORMAT_R32_UINT, 0);
 
-				// Set the type of primitive that should be rendered from this vertex buffer, in this case triangles.
-				myImmContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-				//Individual Object worldMatrix
-				worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation - 15, 2.0f, 2.5f), XMMatrixScaling(5, 5, 5));
-				//INDEXCOUNT, INDEXOFFSET
-				m_ShaderInv->Render(myImmContext, m_indexCount13, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
-				worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation + 55, 2.0f, 2.5f), XMMatrixScaling(5, 5, 5));
-				m_ShaderInv->Render(myImmContext, m_indexCount13, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
-				worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation, 2.0f, 2.5f), XMMatrixScaling(5, 5, 5));
-				//INDEXCOUNT, INDEXOFFSET
-				m_ShaderInv->Render(myImmContext, m_indexCount13, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
-				worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation, 2.0f, 115.5f), XMMatrixScaling(5, 5, 5));
-				//INDEXCOUNT, INDEXOFFSET
-				m_ShaderInv->Render(myImmContext, m_indexCount13, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
-				worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation + 55, 2.0f, 115.5f), XMMatrixScaling(5, 5, 5));
-				//INDEXCOUNT, INDEXOFFSET
-				m_ShaderInv->Render(myImmContext, m_indexCount13, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
-				worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation - 15, 2.0f, 115.5f), XMMatrixScaling(5, 5, 5));
-				//INDEXCOUNT, INDEXOFFSET
-				m_ShaderInv->Render(myImmContext, m_indexCount13, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
-				worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation + 55, 10.0f, 475), XMMatrixRotationRollPitchYaw(0, 1.57, 0));
-				worldMatrix = XMMatrixMultiply(XMMatrixScaling(5, 5, 5), worldMatrix);
-				//INDEXCOUNT, INDEXOFFSET
-				m_ShaderInv->Render(myImmContext, m_indexCount13, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
-				worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation, 10.0f, 475), XMMatrixRotationRollPitchYaw(0, 1.57, 0));
-				worldMatrix = XMMatrixMultiply(XMMatrixScaling(5, 5, 5), worldMatrix);
-				//INDEXCOUNT, INDEXOFFSET
-				m_ShaderInv->Render(myImmContext, m_indexCount13, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
-				worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation - 55, 10.0f, 475), XMMatrixRotationRollPitchYaw(0, 1.57, 0));
-				worldMatrix = XMMatrixMultiply(XMMatrixScaling(5, 5, 5), worldMatrix);
-				//INDEXCOUNT, INDEXOFFSET
-				m_ShaderInv->Render(myImmContext, m_indexCount13, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
+					myImmContext->IASetIndexBuffer(m_indexBufferMap, DXGI_FORMAT_R32_UINT, 0);
+					myImmContext->IASetVertexBuffers(0, 1, &m_vertexBufferSky, &stride, &offset);
+
+					// Just set the WVP to a scale and translate, which will put the square into the bottom right corner of the screen
+					worldMatrix = XMMatrixScaling(0.35f, 0.35f, 0.0f) * XMMatrixTranslation(0.40f, -0.65f, 0.0f);
+					myImmContext->PSSetShaderResources(0, 1, &shaderResourceViewMap);
+					// Draw the map to the square
+					myImmContext->RSSetState(CWcullMode);
+					//Draw the map
+					m_ShaderInv->Render(myImmContext, 6, 0, 0, worldMatrix, XMMatrixIdentity(), XMMatrixIdentity(), m_lightDir, m_diffuseColor);
+				}
+				if (G_SUCCESS(mySurface->GetRenderTarget((void**)&renderTargetViewMap)))
+				{
+					// Grab the Z Buffer if one was requested
+					if (G_SUCCESS(mySurface->GetDepthStencilView((void**)&myDepthStencilView)))
+					{
+						myImmContext->ClearDepthStencilView(myDepthStencilView, D3D11_CLEAR_DEPTH, 1, 0); // clear it to Z exponential Far.
+						myDepthStencilView->Release();
+					}
+
+					// Set our maps Render Target
+					myImmContext->OMSetRenderTargets(1, &renderTargetViewMap, myDepthStencilView);
+					myImmContext->RSSetViewports(1, &miniMap);
+
+					// Clear screen to purple
+					const float purple[] = { .5f, .05f, .5f, 1 };
+					//myImmContext->ClearRenderTargetView(renderTargetViewMap, purple);
+
+					// TODO: Set your shaders, Update & Set your constant buffers, Attatch your vertex & index buffers, Set your InputLayout & Topology & Draw!
+					XMMATRIX worldMatrix;// viewMatrix, projectionMatrix;
+
+
+#pragma region MODEL RENDER
+										 // TODO: Set your shaders, Update & Set your constant buffers, Attatch your vertex & index buffers, Set your InputLayout & Topology & Draw!
+					unsigned int stride;
+					unsigned int offset;
+
+#if MESHLIGHT
+					// Set vertex buffer stride and offset.
+					stride = sizeof(_OBJ_VERT_);
+					offset = 0;
+
+
+#endif // TEXTURE
+
 
 #pragma endregion
+
+					//Set up matrices
+					worldMatrix = DirectX::XMMatrixIdentity();
+					m_Camera->GetViewMatrix(mapView);
+
+					m_lightDir = XMFLOAT3(translation, 0, 50);
+					m_diffuseColor = XMFLOAT4(0, 0, .6f, 1);
+					XMMATRIX mapProjection = XMMatrixOrthographicLH(256, 256, nearPlane, farPlane);
+					XMMATRIX sunMatrix = XMMatrixMultiply(XMMatrixIdentity(), XMMatrixScaling(150, 150, 150));
+					#pragma region Mesh14
+					myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView14);
+					// Set the vertex buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer14, &stride, &offset);
+
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetIndexBuffer(m_indexBuffer14, DXGI_FORMAT_R32_UINT, 0);
+
+					// Set the type of primitive that should be rendered from this vertex buffer, in this case triangles.
+					myImmContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+					//Individual Object worldMatrix
+					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation - 15, 2.0f, 2.5f), XMMatrixScaling(20, 20, 20));
+					//INDEXCOUNT, INDEXOFFSET
+					m_ShaderInv->Render(myImmContext, m_indexCount14, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
+					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation + 55, 2.0f, 2.5f), XMMatrixScaling(20, 20, 20));
+					m_ShaderInv->Render(myImmContext, m_indexCount14, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
+					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation, 2.0f, 2.5f), XMMatrixScaling(20, 20, 20));
+					//INDEXCOUNT, INDEXOFFSET
+					m_ShaderInv->Render(myImmContext, m_indexCount14, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
+					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation, 2.0f, 115.5f), XMMatrixScaling(20, 20, 20));
+					//INDEXCOUNT, INDEXOFFSET
+					m_ShaderInv->Render(myImmContext, m_indexCount14, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
+					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation + 55, 2.0f, 115.5f), XMMatrixScaling(20, 20, 20));
+					//INDEXCOUNT, INDEXOFFSET
+					m_ShaderInv->Render(myImmContext, m_indexCount14, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
+					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation - 15, 2.0f, 115.5f), XMMatrixScaling(20, 20, 20));
+					//INDEXCOUNT, INDEXOFFSET
+					m_ShaderInv->Render(myImmContext, m_indexCount14, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
+					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation + 55, 10.0f, 475), XMMatrixRotationRollPitchYaw(0, 1.57, 0));
+					worldMatrix = XMMatrixMultiply(XMMatrixScaling(20, 20, 20), worldMatrix);
+					//INDEXCOUNT, INDEXOFFSET
+					m_ShaderInv->Render(myImmContext, m_indexCount14, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
+					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation, 10.0f, 475), XMMatrixRotationRollPitchYaw(0, 1.57, 0));
+					worldMatrix = XMMatrixMultiply(XMMatrixScaling(20, 20, 20), worldMatrix);
+					//INDEXCOUNT, INDEXOFFSET
+					m_ShaderInv->Render(myImmContext, m_indexCount14, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
+					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(-translation - 55, 10.0f, 475), XMMatrixRotationRollPitchYaw(0, 1.57, 0));
+					worldMatrix = XMMatrixMultiply(XMMatrixScaling(20, 20, 20), worldMatrix);
+					//INDEXCOUNT, INDEXOFFSET
+					m_ShaderInv->Render(myImmContext, m_indexCount14, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
+
+#pragma endregion
+
+					#pragma region Mesh15
+
+					// Set the vertex buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer15, &stride, &offset);
+
+					// Set the index buffer to active in the input assembler so it can be rendered.
+					myImmContext->IASetIndexBuffer(m_indexBuffer15, DXGI_FORMAT_R32_UINT, 0);
+
+					// Set the type of primitive that should be rendered from this vertex buffer, in this case triangles.
+					myImmContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+					//Sun
+					myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceViewSun);
+
+					//INDEXCOUNT, INDEXOFFSET
+					m_ShaderInv->Render(myImmContext, m_indexCount15, 0, 0, sunMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
+
+					//Earth
+					myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView15);
+					//Individual Object worldMatrix
+					worldMatrix = XMMatrixMultiply(XMMatrixRotationRollPitchYaw(0, orbit, 0), sunMatrix);
+					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(10, 0, 0), worldMatrix);
+					//INDEXCOUNT, INDEXOFFSET
+					m_ShaderInv->Render(myImmContext, m_indexCount15, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
+
+					//Mars
+					myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceViewMars);
+
+					worldMatrix = XMMatrixMultiply(XMMatrixRotationRollPitchYaw(0, orbit * .75f, 0), sunMatrix);
+					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(15, 0, 0), worldMatrix);
+
+					//INDEXCOUNT, INDEXOFFSET
+					m_ShaderInv->Render(myImmContext, m_indexCount15, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
+
+					//Jupiter
+					myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceViewJupiter);
+
+					//Individual Object worldMatrix
+					worldMatrix = XMMatrixMultiply(XMMatrixRotationRollPitchYaw(0, orbit * .5f, 0), sunMatrix);
+					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(20, 0, 0), worldMatrix);
+
+					//INDEXCOUNT, INDEXOFFSET
+					m_ShaderInv->Render(myImmContext, m_indexCount15, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
+
+#pragma endregion
+				}
+				break;
+			}
+			default:
+				break;
 		}
-		}
-		//myImmContext->FinishCommandList(FALSE, &m_CommandList);
+
+
 		if (myRenderTargetView)	
 			myRenderTargetView->Release();
 		if (renderTargetViewMap)		
@@ -2649,11 +3219,6 @@ void LetsDrawSomeStuff::BuildCommandList()
 
 void LetsDrawSomeStuff::Execute()
  {
-	 //if (myImmContext)
-	 //{
-		// myImmContext->ExecuteCommandList(m_CommandList, false);
-	 //}
-
 	 // Present Backbuffer using Swapchain object
 	 // Framerate is currently unlocked, we suggest "MSI Afterburner" to track your current FPS and memory usage.
 	 mySwapChain->Present(0, 0);

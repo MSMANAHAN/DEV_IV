@@ -124,6 +124,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Asian_Nomad_Old_Man_Body.h" />
+    <ClInclude Include="asteroid.h" />
     <ClInclude Include="CameraClass.h" />
     <ClInclude Include="chevalier.h" />
     <ClInclude Include="CommodoreUte.h" />
@@ -142,6 +143,7 @@
     <ClInclude Include="Rope Bridge.h" />
     <ClInclude Include="ShaderInvoker.h" />
     <ClInclude Include="sword1.h" />
+    <ClInclude Include="talon.h" />
     <ClInclude Include="test pyramid.h" />
     <ClInclude Include="tree.h" />
     <ClInclude Include="wall.h" />

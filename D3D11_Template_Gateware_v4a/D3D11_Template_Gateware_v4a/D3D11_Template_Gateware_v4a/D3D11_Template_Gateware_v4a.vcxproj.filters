@@ -81,6 +81,12 @@
     <ClInclude Include="CommodoreUte.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="talon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="asteroid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">

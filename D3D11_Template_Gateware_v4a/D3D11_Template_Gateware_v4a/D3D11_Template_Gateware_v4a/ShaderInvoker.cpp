@@ -12,7 +12,6 @@ ShaderInvoker::ShaderInvoker()
 
 }
 
-
 ShaderInvoker::~ShaderInvoker()
 {
 }
