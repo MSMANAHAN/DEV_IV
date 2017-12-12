@@ -129,7 +129,6 @@
     <ClInclude Include="CommodoreUte.h" />
     <ClInclude Include="DirectXTex-master\DDSTextureLoader\DDSTextureLoader.h" />
     <ClInclude Include="DirectXTex-master\DirectXTex\DirectXTex.h" />
-    <ClInclude Include="Dodge_Chellenger_SRT10_OBJ.h" />
     <ClInclude Include="Grass_01.h" />
     <ClInclude Include="Grass_02.h" />
     <ClInclude Include="Grass_03.h" />
