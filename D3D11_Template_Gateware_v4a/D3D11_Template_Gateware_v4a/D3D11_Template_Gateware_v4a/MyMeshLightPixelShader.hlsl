@@ -38,7 +38,7 @@ float4 MeshLightPixelShader(PixelInputType input) : SV_TARGET
     float3 surfacePos;
     float lightposSurf;
     float3 lightToPixelVec;
-    float radius = 50;
+    float radius = 30;
     float4 greenTint;
     float3 lightDirect;
     float4 lightPosSurface;
@@ -49,13 +49,14 @@ float4 MeshLightPixelShader(PixelInputType input) : SV_TARGET
 
     // Sample the pixel color from the texture using the sampler at this texture coordinate location.
     textureColor = shaderTexture.Sample(SampleType, (float2) input.tex);
+    
 
-    redTint[0] = 1;
+    redTint[0] = 0.03;
     redTint[1] = 0;
     redTint[2] = 0;
     redTint[3] = 0;
 
-    greenTint[0] = 0;
+    greenTint[0] = 0.003;
     greenTint[1] = 0;
     greenTint[2] = 0;
     greenTint[3] = 0;
@@ -97,7 +98,7 @@ float4 MeshLightPixelShader(PixelInputType input) : SV_TARGET
 
     color =
     attenuation[0] +
-    attenuation[1] * dist +
+    attenuation[1] +
     attenuation[2] * (dist * dist)+
     attenuation[3] * (dist);
     return color;
