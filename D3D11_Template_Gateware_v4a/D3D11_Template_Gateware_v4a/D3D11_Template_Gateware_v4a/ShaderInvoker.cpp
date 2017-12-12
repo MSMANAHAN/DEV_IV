@@ -488,20 +488,6 @@ void ShaderInvoker::RenderShader(ID3D11DeviceContext *deviceContext, int indexCo
 {
 	// Set the vertex input layout.
 	deviceContext->IASetInputLayout(m_layout);
-#if COLORSH
-	// Set the vertex and pixel shaders that will be used to render this triangle.
-	deviceContext->VSSetShader(m_vertexShader, NULL, 0);
-	deviceContext->PSSetShader(m_pixelShader, NULL, 0);
-
-#endif // 0
-
-#if TEXTURESH
-	// Set the vertex and pixel shaders that will be used to render this triangle.
-	deviceContext->VSSetShader(m_vertexTexShader, NULL, 0);
-	deviceContext->PSSetShader(m_pixelTexShader, NULL, 0);
-	deviceContext->PSSetSamplers(0, 1, &m_samplerState);
-#endif // TEXTURESH
-
 #if MESHLIGHTSH
 	// Set the vertex, geometry, and pixel shaders that will be used to render this triangle.
 	if (sinRendering)	

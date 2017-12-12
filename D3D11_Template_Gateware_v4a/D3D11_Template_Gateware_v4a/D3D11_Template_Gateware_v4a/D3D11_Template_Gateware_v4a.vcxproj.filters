@@ -75,6 +75,15 @@
     <ClInclude Include="Asian_Nomad_Old_Man_Body.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ROAD.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Dodge_Chellenger_SRT10_OBJ.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CommodoreUte.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">

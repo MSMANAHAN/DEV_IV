@@ -126,8 +126,10 @@
     <ClInclude Include="Asian_Nomad_Old_Man_Body.h" />
     <ClInclude Include="CameraClass.h" />
     <ClInclude Include="chevalier.h" />
+    <ClInclude Include="CommodoreUte.h" />
     <ClInclude Include="DirectXTex-master\DDSTextureLoader\DDSTextureLoader.h" />
     <ClInclude Include="DirectXTex-master\DirectXTex\DirectXTex.h" />
+    <ClInclude Include="Dodge_Chellenger_SRT10_OBJ.h" />
     <ClInclude Include="Grass_01.h" />
     <ClInclude Include="Grass_02.h" />
     <ClInclude Include="Grass_03.h" />
@@ -135,6 +137,7 @@
     <ClInclude Include="knight3.h" />
     <ClInclude Include="LetsDrawSomeStuff.h" />
     <ClInclude Include="model.h" />
+    <ClInclude Include="ROAD.h" />
     <ClInclude Include="Rock.h" />
     <ClInclude Include="Rock_6.h" />
     <ClInclude Include="Rope Bridge.h" />
