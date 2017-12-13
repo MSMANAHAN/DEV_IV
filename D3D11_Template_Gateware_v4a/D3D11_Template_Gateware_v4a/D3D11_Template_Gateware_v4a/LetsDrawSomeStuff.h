@@ -59,7 +59,7 @@ class LetsDrawSomeStuff
 	ID3D11Buffer* m_instanceBuffer;
 	unsigned int m_instanceCount;
 	std::vector<std::thread> ThreadVector;
-
+	float aRatio = 0;
 	D3D11_TEXTURE2D_DESC mapTextureDesc;
 	D3D11_RENDER_TARGET_VIEW_DESC mapRenderTargetViewDesc;
 	D3D11_SHADER_RESOURCE_VIEW_DESC mapShaderResourceViewDesc;
@@ -2001,6 +2001,7 @@ void LetsDrawSomeStuff::Render()
 						myDepthStencilView->Release();
 					}
 
+
 					// Set active target for drawing, all array based D3D11 functions should use a syntax similar to below
 					ID3D11RenderTargetView* const targets[] = { myRenderTargetView };
 					myImmContext->OMSetRenderTargets(1, targets, myDepthStencilView);
@@ -2015,40 +2016,33 @@ void LetsDrawSomeStuff::Render()
 					//Render Camera
 					m_Camera->Render();
 
-	#pragma region MODEL RENDER
+#pragma region MODEL RENDER
 					// TODO: Set your shaders, Update & Set your constant buffers, Attatch your vertex & index buffers, Set your InputLayout & Topology & Draw!
 					unsigned int stride;
 					unsigned int offset;
 
-	#if MESHLIGHT
+#if MESHLIGHT
 					// Set vertex buffer stride and offset.
 					stride = sizeof(_OBJ_VERT_);
 					offset = 0;
 
 
-	#endif // TEXTURE
+#endif // TEXTURE
 
 
-	#pragma endregion
+#pragma endregion
 
 					//Set up matrices
 					worldMatrix = DirectX::XMMatrixIdentity();
 					m_Camera->GetViewMatrix(viewMatrix);
 
-					if (height && width)
-					{
-						if (width >= height)
-						{
-							projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(3.14f / zoomFOV, (float)(width / height), nearPlane, farPlane);
-						}
-						else
-							projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(3.14f / zoomFOV, (float)(height / width), nearPlane, farPlane);
-					}
+					projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(3.14f / zoomFOV, (width / (float)height), nearPlane, farPlane);
+
 
 					m_lightDir = XMFLOAT3(translation, 0, 50);
 					m_diffuseColor = XMFLOAT4(0.6f, 0, 0, 1);
 
-	#pragma region Mesh1
+#pragma region Mesh1
 					myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView1);
 					// Set the vertex buffer to active in the input assembler so it can be rendered.
 					myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer1, &stride, &offset);
@@ -2063,9 +2057,9 @@ void LetsDrawSomeStuff::Render()
 					//INDEXCOUNT, INDEXOFFSET
 					m_ShaderInv->Render(myImmContext, m_vertexCount1, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
 
-	#pragma endregion
+#pragma endregion
 
-	#pragma region Mesh2
+#pragma region Mesh2
 					//m_ShaderInv->UVScrolling = true;
 					//myContext->PSSetShaderResources(0, 1, &m_shaderResourceView2);
 					//// Set the vertex buffer to active in the input assembler so it can be rendered.
@@ -2090,9 +2084,9 @@ void LetsDrawSomeStuff::Render()
 					//worldMatrix = XMMatrixMultiply(XMMatrixScaling(45, 45, 45), XMMatrixTranslation(140 + translation, 25, 60));
 					//m_ShaderInv->Render(myContext, m_indexCount2, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
 
-	#pragma endregion
+#pragma endregion
 
-	#pragma region Mesh3
+#pragma region Mesh3
 					unsigned int strides[2];
 					unsigned int offsets[2];
 					ID3D11Buffer* bufferPointers[2];
@@ -2120,10 +2114,10 @@ void LetsDrawSomeStuff::Render()
 					worldMatrix = XMMatrixMultiply(XMMatrixTranslation(0, 4.0f, 10), XMMatrixScaling(1.0f, 1.0f, 1.0f));
 					m_ShaderInv->Render(myImmContext, m_indexCount3, 0, m_instanceCount, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
 					m_ShaderInv->instanceRendering = false;
-	#pragma endregion
+#pragma endregion
 
-	#pragma region Mesh4
-	#if 0
+#pragma region Mesh4
+#if 0
 					myContext->PSSetShaderResources(0, 1, &m_shaderResourceView4);
 					//			 Set the vertex buffer to active in the input assembler so it can be rendered.
 					myContext->IASetVertexBuffers(0, 1, &m_vertexBuffer4, &stride, &offset);
@@ -2138,11 +2132,11 @@ void LetsDrawSomeStuff::Render()
 					worldMatrix = XMMatrixMultiply(XMMatrixScaling(45, 45, 45), XMMatrixTranslation(-translation, 4, 60));
 					m_ShaderInv->Render(myContext, m_indexCount4, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
 
-	#endif // 0
+#endif // 0
 
-	#pragma endregion
+#pragma endregion
 
-	#pragma region Mesh5
+#pragma region Mesh5
 					m_ShaderInv->sinRendering = true;
 					myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView5);
 					// Set the vertex buffer to active in the input assembler so it can be rendered.
@@ -2156,9 +2150,9 @@ void LetsDrawSomeStuff::Render()
 					m_ShaderInv->Render(myImmContext, m_indexCount5, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
 					m_ShaderInv->sinRendering = false;
 
-	#pragma endregion
+#pragma endregion
 
-	#pragma region Mesh6
+#pragma region Mesh6
 					myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView6);
 					// Set the vertex buffer to active in the input assembler so it can be rendered.
 					myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer6, &stride, &offset);
@@ -2172,9 +2166,9 @@ void LetsDrawSomeStuff::Render()
 
 					m_ShaderInv->Render(myImmContext, m_indexCount6, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
 
-	#pragma endregion
+#pragma endregion
 
-	#pragma region Mesh7
+#pragma region Mesh7
 					myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView7);
 					// Set the vertex buffer to active in the input assembler so it can be rendered.
 					myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer7, &stride, &offset);
@@ -2186,9 +2180,9 @@ void LetsDrawSomeStuff::Render()
 					worldMatrix = XMMatrixMultiply(XMMatrixScaling(.1f, .1f, .1f), XMMatrixTranslation(-10, 4, 50));
 					m_ShaderInv->Render(myImmContext, m_indexCount7, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
 
-	#pragma endregion
+#pragma endregion
 
-	#pragma region Mesh8
+#pragma region Mesh8
 					myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView8);
 					// Set the vertex buffer to active in the input assembler so it can be rendered.
 					myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer8, &stride, &offset);
@@ -2201,9 +2195,9 @@ void LetsDrawSomeStuff::Render()
 					worldMatrix = XMMatrixMultiply(XMMatrixScaling(.3f, .3f, .3f), worldMatrix);
 					m_ShaderInv->Render(myImmContext, m_indexCount8, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
 
-	#pragma endregion
+#pragma endregion
 
-	#pragma region Mesh9
+#pragma region Mesh9
 					myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView9);
 					// Set the vertex buffer to active in the input assembler so it can be rendered.
 					myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer9, &stride, &offset);
@@ -2216,9 +2210,9 @@ void LetsDrawSomeStuff::Render()
 					worldMatrix = XMMatrixMultiply(XMMatrixRotationRollPitchYaw(0, .5, 0), worldMatrix);
 					m_ShaderInv->Render(myImmContext, m_indexCount9, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
 
-	#pragma endregion
+#pragma endregion
 
-	#pragma region Mesh10
+#pragma region Mesh10
 					myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView10);
 					// Set the vertex buffer to active in the input assembler so it can be rendered.
 					myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer10, &stride, &offset);
@@ -2236,9 +2230,9 @@ void LetsDrawSomeStuff::Render()
 					worldMatrix = XMMatrixMultiply(XMMatrixRotationRollPitchYaw(0, .5, 0), worldMatrix);
 					m_ShaderInv->Render(myImmContext, m_indexCount10, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
 
-	#pragma endregion
+#pragma endregion
 
-	#pragma region Mesh11
+#pragma region Mesh11
 					myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView11);
 					// Set the vertex buffer to active in the input assembler so it can be rendered.
 					myImmContext->IASetVertexBuffers(0, 1, &m_vertexBuffer11, &stride, &offset);
@@ -2251,9 +2245,9 @@ void LetsDrawSomeStuff::Render()
 					worldMatrix = XMMatrixMultiply(XMMatrixRotationRollPitchYaw(0, 3.14159265f, 0), worldMatrix);
 					m_ShaderInv->Render(myImmContext, m_indexCount11, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
 
-	#pragma endregion
+#pragma endregion
 
-	#pragma region Skybox
+#pragma region Skybox
 					m_ShaderInv->skyBox = true;
 					myImmContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
@@ -2269,35 +2263,37 @@ void LetsDrawSomeStuff::Render()
 					m_ShaderInv->Render(myImmContext, m_indexCountSky, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
 					m_ShaderInv->skyBox = false;
 
-	#pragma endregion
+#pragma endregion
+				
 
-				}
-				if (G_SUCCESS(mySurface->GetRenderTarget((void**)&myRenderTargetView)))
-				{
-					// Grab the Z Buffer if one was requested
-					if (G_SUCCESS(mySurface->GetDepthStencilView((void**)&myDepthStencilView)))
-					{
-						myImmContext->ClearDepthStencilView(myDepthStencilView, D3D11_CLEAR_DEPTH, 1, 0); // clear it to Z exponential Far.
-						myDepthStencilView->Release();
-					}
+
+				//
+				//if (G_SUCCESS(mySurface->GetRenderTarget((void**)&myRenderTargetView)))
+				//{
+				//	// Grab the Z Buffer if one was requested
+				//	if (G_SUCCESS(mySurface->GetDepthStencilView((void**)&myDepthStencilView)))
+				//	{
+				//		myImmContext->ClearDepthStencilView(myDepthStencilView, D3D11_CLEAR_DEPTH, 1, 0); // clear it to Z exponential Far.
+				//		myDepthStencilView->Release();
+				//	}
 
 					// Set active target for drawing, all array based D3D11 functions should use a syntax similar to below
-					ID3D11RenderTargetView* const targets[] = { myRenderTargetView };
-					myImmContext->OMSetRenderTargets(1, targets, myDepthStencilView);
-					myImmContext->RSSetViewports(1, &mainScreen);
+					//D3D11RenderTargetView* const targets[] = { myRenderTargetView };
+					//myImmContext->OMSetRenderTargets(1, targets, myDepthStencilView);
+					//myImmContext->RSSetViewports(1, &mainScreen);
 
 					// Clear screen to purple
-					const float purple[] = { .5f, .05f, .5f, 1 };
+					//const float purple[] = { .5f, .05f, .5f, 1 };
 					//myImmContext->ClearRenderTargetView(myRenderTargetView, purple);
 
 					// TODO: Set your shaders, Update & Set your constant buffers, Attatch your vertex & index buffers, Set your InputLayout & Topology & Draw!
-					XMMATRIX worldMatrix;// , viewMatrix, projectionMatrix;
+					//XMMATRIX worldMatrix;// , viewMatrix, projectionMatrix;
 
 
 	#pragma region MODEL RENDER
 	// TODO: Set your shaders, Update & Set your constant buffers, Attatch your vertex & index buffers, Set your InputLayout & Topology & Draw!
-					unsigned int stride;
-					unsigned int offset;
+					//unsigned int stride;
+					//unsigned int offset;
 
 	#if MESHLIGHT
 					// Set vertex buffer stride and offset.
@@ -2321,7 +2317,10 @@ void LetsDrawSomeStuff::Render()
 					myImmContext->RSSetState(CWcullMode);
 					//Draw the second cube
 					m_ShaderInv->Render(myImmContext, 6, 0, 0, worldMatrix, XMMatrixIdentity(), XMMatrixIdentity(), m_lightDir, m_diffuseColor);
+					if (myRenderTargetView)
+						myRenderTargetView->Release();
 				}
+
 				if (G_SUCCESS(mySurface->GetRenderTarget((void**)&renderTargetViewMap)))
 				{
 					// Grab the Z Buffer if one was requested
@@ -2344,7 +2343,7 @@ void LetsDrawSomeStuff::Render()
 					//Render Camera
 					//m_Camera->Render();
 
-	#pragma region MODEL RENDER
+					#pragma region MODEL RENDER
 	// TODO: Set your shaders, Update & Set your constant buffers, Attatch your vertex & index buffers, Set your InputLayout & Topology & Draw!
 					unsigned int stride;
 					unsigned int offset;
@@ -2362,12 +2361,32 @@ void LetsDrawSomeStuff::Render()
 
 					//Set up matrices
 					worldMatrix = DirectX::XMMatrixIdentity();
+					XMVECTORF32 mapPositionD, mapTargetD;
+
+					XMVECTOR mapCamPosition;
+					mapPositionD.f[0] = m_Camera->GetPosition().x;
+					mapPositionD.f[1] = m_Camera->GetPosition().y + 100;
+					mapPositionD.f[2] = m_Camera->GetPosition().z;
+					mapTargetD.f[0] = m_Camera->GetPosition().x;
+					mapTargetD.f[1] = m_Camera->GetPosition().y;
+					mapTargetD.f[2] = m_Camera->GetPosition().z;
+					mapCamPosition = mapPositionD;
+					XMVECTOR mapCamTarget = mapTargetD;
+					XMVECTOR mapCamUp = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
+
+					//Set the View matrix
+					mapView = XMMatrixLookAtLH(mapCamPosition, mapCamTarget, mapCamUp);
 					m_Camera->GetViewMatrix(mapView);
 
 					m_lightDir = XMFLOAT3(translation, 0, 50);
 					m_diffuseColor = XMFLOAT4(0, 0, .6f, 1);
+
 					XMMATRIX mapProjection = XMMatrixOrthographicLH(256, 256, nearPlane, farPlane);
 
+					if (height && width)
+					{
+						mapProjection = XMMatrixOrthographicLH(width/3, height/3, nearPlane, farPlane);
+					}
 	#pragma region Mesh1
 					myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView1);
 					// Set the vertex buffer to active in the input assembler so it can be rendered.
@@ -2571,7 +2590,9 @@ void LetsDrawSomeStuff::Render()
 					m_ShaderInv->Render(myImmContext, m_indexCount11, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
 
 	#pragma endregion
-				}			
+					if (renderTargetViewMap)
+						renderTargetViewMap->Release();
+				}		
 				break;
 			}
 			case RoadToVictory:
@@ -2616,16 +2637,8 @@ void LetsDrawSomeStuff::Render()
 					//Set up matrices
 					worldMatrix = DirectX::XMMatrixIdentity();
 					m_Camera->GetViewMatrix(viewMatrix);
+					projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(3.14f / zoomFOV, (width / (float)height), nearPlane, farPlane);
 
-					if (height && width)
-					{
-						if (width >= height)
-						{
-							projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(3.14f / zoomFOV, (float)(width / height), nearPlane, farPlane);
-						}
-						else
-							projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(3.14f / zoomFOV, (float)(height / width), nearPlane, farPlane);
-					}
 
 					m_lightDir = XMFLOAT3(translation, 0, 50);
 					m_diffuseColor = XMFLOAT4(0.6f, 0, 0, 1);
@@ -2710,44 +2723,7 @@ void LetsDrawSomeStuff::Render()
 
 	#pragma endregion
 
-				}
-				if (G_SUCCESS(mySurface->GetRenderTarget((void**)&myRenderTargetView)))
-				{
-					// Grab the Z Buffer if one was requested
-					if (G_SUCCESS(mySurface->GetDepthStencilView((void**)&myDepthStencilView)))
-					{
-						myImmContext->ClearDepthStencilView(myDepthStencilView, D3D11_CLEAR_DEPTH, 1, 0); // clear it to Z exponential Far.
-						myDepthStencilView->Release();
-					}
-
-					// Set active target for drawing, all array based D3D11 functions should use a syntax similar to below
-					ID3D11RenderTargetView* const targets[] = { myRenderTargetView };
-					myImmContext->OMSetRenderTargets(1, targets, myDepthStencilView);
-					myImmContext->RSSetViewports(1, &mainScreen);
-
-					// Clear screen to purple
-					const float purple[] = { .5f, .05f, .5f, 1 };
-					//myImmContext->ClearRenderTargetView(myRenderTargetView, purple);
-
-					// TODO: Set your shaders, Update & Set your constant buffers, Attatch your vertex & index buffers, Set your InputLayout & Topology & Draw!
-					XMMATRIX worldMatrix;// , viewMatrix, projectionMatrix;
-
-
-					#pragma region MODEL RENDER
-											// TODO: Set your shaders, Update & Set your constant buffers, Attatch your vertex & index buffers, Set your InputLayout & Topology & Draw!
-					unsigned int stride;
-					unsigned int offset;
-
-	#if MESHLIGHT
-					// Set vertex buffer stride and offset.
-					stride = sizeof(_OBJ_VERT_);
-					offset = 0;
-
-
-	#endif // TEXTURE
-
-
-	#pragma endregion
+				
 
 
 					myImmContext->IASetIndexBuffer(m_indexBufferMap, DXGI_FORMAT_R32_UINT, 0);
@@ -2760,6 +2736,10 @@ void LetsDrawSomeStuff::Render()
 					myImmContext->RSSetState(CWcullMode);
 					//Draw the map
 					m_ShaderInv->Render(myImmContext, 6, 0, 0, worldMatrix, XMMatrixIdentity(), XMMatrixIdentity(), m_lightDir, m_diffuseColor);
+					if (myRenderTargetView)					
+						myRenderTargetView->Release();
+
+					
 				}
 				if (G_SUCCESS(mySurface->GetRenderTarget((void**)&renderTargetViewMap)))
 				{
@@ -2800,12 +2780,30 @@ void LetsDrawSomeStuff::Render()
 
 					//Set up matrices
 					worldMatrix = DirectX::XMMatrixIdentity();
+					XMVECTORF32 mapPositionD, mapTargetD;
+
+					XMVECTOR mapCamPosition;
+					mapPositionD.f[0] = m_Camera->GetPosition().x;
+					mapPositionD.f[1] = m_Camera->GetPosition().y + 100;
+					mapPositionD.f[2] = m_Camera->GetPosition().z;
+					mapTargetD.f[0] = m_Camera->GetPosition().x;
+					mapTargetD.f[1] = m_Camera->GetPosition().y;
+					mapTargetD.f[2] = m_Camera->GetPosition().z;
+					mapCamPosition = mapPositionD;
+					XMVECTOR mapCamTarget = mapTargetD;
+					XMVECTOR mapCamUp = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
+
+					//Set the View matrix
+					mapView = XMMatrixLookAtLH(mapCamPosition, mapCamTarget, mapCamUp);
 					m_Camera->GetViewMatrix(mapView);
 
 					m_lightDir = XMFLOAT3(translation, 0, 50);
 					m_diffuseColor = XMFLOAT4(0, 0, .6f, 1);
 					XMMATRIX mapProjection = XMMatrixOrthographicLH(256, 256, nearPlane, farPlane);
-				
+					if (height && width)
+					{
+						mapProjection = XMMatrixOrthographicLH(width / 3, height / 3, nearPlane, farPlane);
+					}
 					#pragma region Mesh12
 					myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView12);
 					// Set the vertex buffer to active in the input assembler so it can be rendered.
@@ -2865,6 +2863,8 @@ void LetsDrawSomeStuff::Render()
 					m_ShaderInv->Render(myImmContext, m_indexCount13, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
 
 	#pragma endregion
+					if (renderTargetViewMap)
+						renderTargetViewMap->Release();
 			}			
 				break;
 			}
@@ -2911,15 +2911,8 @@ void LetsDrawSomeStuff::Render()
 					worldMatrix = DirectX::XMMatrixIdentity();
 					m_Camera->GetViewMatrix(viewMatrix);
 
-					if (height && width)
-					{
-						if (width >= height)
-						{
-							projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(3.14f / zoomFOV, (float)(width / height), nearPlane, farPlane);
-						}
-						else
-							projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(3.14f / zoomFOV, (float)(height / width), nearPlane, farPlane);
-					}
+					projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(3.14f / zoomFOV, (width / (float)height), nearPlane, farPlane);
+
 
 					m_lightDir = XMFLOAT3(0, 0, 0);
 					m_diffuseColor = XMFLOAT4(0.6f, 0, 0, 1);
@@ -3012,45 +3005,7 @@ void LetsDrawSomeStuff::Render()
 					m_ShaderInv->Render(myImmContext, m_indexCount15, 0, 0, worldMatrix, viewMatrix, projectionMatrix, m_lightDir, m_diffuseColor);
 
 #pragma endregion
-				}
-				if (G_SUCCESS(mySurface->GetRenderTarget((void**)&myRenderTargetView)))
-				{
-					// Grab the Z Buffer if one was requested
-					if (G_SUCCESS(mySurface->GetDepthStencilView((void**)&myDepthStencilView)))
-					{
-						myImmContext->ClearDepthStencilView(myDepthStencilView, D3D11_CLEAR_DEPTH, 1, 0); // clear it to Z exponential Far.
-						myDepthStencilView->Release();
-					}
-
-					// Set active target for drawing, all array based D3D11 functions should use a syntax similar to below
-					ID3D11RenderTargetView* const targets[] = { myRenderTargetView };
-					myImmContext->OMSetRenderTargets(1, targets, myDepthStencilView);
-					myImmContext->RSSetViewports(1, &mainScreen);
-
-					// Clear screen to purple
-					const float purple[] = { .5f, .05f, .5f, 1 };
-					//myImmContext->ClearRenderTargetView(myRenderTargetView, purple);
-
-					// TODO: Set your shaders, Update & Set your constant buffers, Attatch your vertex & index buffers, Set your InputLayout & Topology & Draw!
-					XMMATRIX worldMatrix;// , viewMatrix, projectionMatrix;
-
-
-#pragma region MODEL RENDER
-										 // TODO: Set your shaders, Update & Set your constant buffers, Attatch your vertex & index buffers, Set your InputLayout & Topology & Draw!
-					unsigned int stride;
-					unsigned int offset;
-
-#if MESHLIGHT
-					// Set vertex buffer stride and offset.
-					stride = sizeof(_OBJ_VERT_);
-					offset = 0;
-
-
-#endif // TEXTURE
-
-
-#pragma endregion
-
+				
 
 					myImmContext->IASetIndexBuffer(m_indexBufferMap, DXGI_FORMAT_R32_UINT, 0);
 					myImmContext->IASetVertexBuffers(0, 1, &m_vertexBufferSky, &stride, &offset);
@@ -3062,6 +3017,8 @@ void LetsDrawSomeStuff::Render()
 					myImmContext->RSSetState(CWcullMode);
 					//Draw the map
 					m_ShaderInv->Render(myImmContext, 6, 0, 0, worldMatrix, XMMatrixIdentity(), XMMatrixIdentity(), m_lightDir, m_diffuseColor);
+					if (myRenderTargetView)
+						myRenderTargetView->Release();
 				}
 				if (G_SUCCESS(mySurface->GetRenderTarget((void**)&renderTargetViewMap)))
 				{
@@ -3102,11 +3059,31 @@ void LetsDrawSomeStuff::Render()
 
 					//Set up matrices
 					worldMatrix = DirectX::XMMatrixIdentity();
+					XMVECTORF32 mapPositionD, mapTargetD;
+
+					XMVECTOR mapCamPosition;
+					mapPositionD.f[0] = m_Camera->GetPosition().x;
+					mapPositionD.f[1] = m_Camera->GetPosition().y + 100;
+					mapPositionD.f[2] = m_Camera->GetPosition().z;
+					mapTargetD.f[0] = m_Camera->GetPosition().x;
+					mapTargetD.f[1] = m_Camera->GetPosition().y;
+					mapTargetD.f[2] = m_Camera->GetPosition().z;
+					mapCamPosition = mapPositionD;
+					XMVECTOR mapCamTarget = mapTargetD;
+					XMVECTOR mapCamUp = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
+
+					//Set the View matrix
+					mapView = XMMatrixLookAtLH(mapCamPosition, mapCamTarget, mapCamUp);
 					m_Camera->GetViewMatrix(mapView);
 
 					m_lightDir = XMFLOAT3(translation, 0, 50);
 					m_diffuseColor = XMFLOAT4(0, 0, .6f, 1);
 					XMMATRIX mapProjection = XMMatrixOrthographicLH(256, 256, nearPlane, farPlane);
+					if (height && width)
+					{
+						mapProjection = XMMatrixOrthographicLH(width / 3, height / 3, nearPlane, farPlane);
+					}
+
 					XMMATRIX sunMatrix = XMMatrixMultiply(XMMatrixIdentity(), XMMatrixScaling(150, 150, 150));
 					#pragma region Mesh14
 					myImmContext->PSSetShaderResources(0, 1, &m_shaderResourceView14);
@@ -3196,18 +3173,14 @@ void LetsDrawSomeStuff::Render()
 					m_ShaderInv->Render(myImmContext, m_indexCount15, 0, 0, worldMatrix, mapView, mapProjection, m_lightDir, m_diffuseColor);
 
 #pragma endregion
+					if (renderTargetViewMap)
+						renderTargetViewMap->Release();
 				}
 				break;
 			}
 			default:
 				break;
 		}
-
-
-		if (myRenderTargetView)	
-			myRenderTargetView->Release();
-		if (renderTargetViewMap)		
-			renderTargetViewMap->Release();
 	}
 }
 
